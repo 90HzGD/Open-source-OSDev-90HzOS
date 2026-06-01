@@ -52,7 +52,7 @@ This is the begining of my project _90HzOS_. (Sorry for bad english) This projec
                 - **kbinit():**               outbyte at 0x21: 0b11111101 (activates only keyboard)
                 - **enable_int():**           enables CPU interrupts (only keyboard for now)
                 - **keyboard_handler():**     set in idt, manage each input on the keyboard (such as pressed / released, toogles Shift on or off, same for Ctrl and Alt btw)
-                - **handle_keyboard():**      in kernel.c, manage the output of the keyboard, if 0x64 returns 1, the kernel talk to 0x60 to get the scancode, manages extended keys too.
+                - **handle_keyboard():**      in kernel.c, manage the output of the keyboard, if 0x64 returns 1, the kernel talks to 0x60 to get the scancode, manages extended keys too.
         - ## **KEYBOARD DRIVER API**
             - Some functions to easily access to the keyboard activity via this **API**:
                 - **get_key():**           outputs scancode _(does not wait for you to press smt, returns 0 if None keys are pressed)_
