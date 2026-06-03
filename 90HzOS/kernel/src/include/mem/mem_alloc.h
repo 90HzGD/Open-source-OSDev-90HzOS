@@ -7,6 +7,7 @@
     unsigned int get_remain_heap_RAM(unsigned char mode);
     unsigned int* get_previous_bloc(unsigned int* bloc);
     unsigned int* get_next_bloc(unsigned int* bolc);
+    void init_bloc(unsigned int* ALLOC_ADR);                // Overrides bloc content w/ only zeros
 
     unsigned int* malloc(unsigned int size){
         // Invalid Size
@@ -133,6 +134,13 @@
 
     unsigned int* get_next_bloc(unsigned int* bloc){
         return (bloc-1)+(*(bloc-1)/4)+3;
+    }
+
+    void init_bloc(unsigned int* ALLOC_ADR){
+        for (unsigned int i = 0; i != *(ALLOC_ADR - 1)/4; ++i){
+            *(ALLOC_ADR + i) = 0;
+        }
+        return;
     }
 
 #endif

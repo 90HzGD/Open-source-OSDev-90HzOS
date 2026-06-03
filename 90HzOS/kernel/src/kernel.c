@@ -31,14 +31,22 @@ enum Return_codes_main main(){
     kb_init();
     enable_int();
 
-    unsigned int* kaka  = malloc(sizeof(unsigned int));     /* Malloc Test */
-    unsigned int* cul   = malloc(4);                        //
-    unsigned int* prout = malloc(sizeof(unsigned int));     /*             */
-    *cul = 125125;
-    *prout = 8596;
-    *kaka = 2000000000;
-    if (cul == 0x00 || kaka == 0x00 || prout == 0x00){
+    unsigned int* test_malloc  = malloc(sizeof(unsigned int));     /* Malloc Test */
+    unsigned int* test_malloc0 = malloc(4);                        //
+    unsigned int* test_malloc1 = malloc(sizeof(unsigned int));     /*             */
+    *test_malloc0 = 125125;
+    *test_malloc1 = 8596;
+    *test_malloc = 2000000000;
+    if (test_malloc0 == 0x00 || test_malloc == 0x00 || test_malloc1 == 0x00){
         printf("\033\x07[\033\x04WARN\033\x07]\033\x0F Malloc() returned 0! Check if your memory is functionnable.");
+    }
+    else {
+        init_bloc(test_malloc);
+        init_bloc(test_malloc0);
+        init_bloc(test_malloc1);
+        free(test_malloc);
+        free(test_malloc0);
+        free(test_malloc1);
     }
 
     replace_string(string, "Initialized keyboard.\n");
@@ -50,7 +58,6 @@ enum Return_codes_main main(){
     print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x1F, &position);
 
     next_entry(0);
-    free(kaka);
     return end_rcode;
 }
 
