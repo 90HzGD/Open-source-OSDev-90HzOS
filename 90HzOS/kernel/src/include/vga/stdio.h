@@ -11,6 +11,7 @@
 
     void change_color(const char color, volatile unsigned int *position){
         *((unsigned char*)VRAM_ATT_ADR+(*position*2)) = color;
+        return;
     }
     
     void clear_screen(volatile unsigned int* position){
@@ -18,7 +19,10 @@
             *((unsigned char*)VRAM_CHAR_ADR+(i*2)) = 0;
             *((unsigned char*)VRAM_ATT_ADR+(i*2)) = 0x0F;
         }
-        *position = 0;
+        if (*position >= 80*25){
+            *position -= (*position % 80);
+        }
+        return;
     }
 
     void move_grid(unsigned int count){

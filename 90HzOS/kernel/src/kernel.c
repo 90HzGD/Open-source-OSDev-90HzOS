@@ -13,6 +13,7 @@ extern char kernel_end;
 void init_heap(unsigned int total_RAM);
 
 enum Return_codes_main main(){
+    extern void freeze();
     enum Return_codes_main end_rcode = OK;
     
     unsigned int* main_ptr = (unsigned int*)&main;
@@ -30,9 +31,15 @@ enum Return_codes_main main(){
     kb_init();
     enable_int();
 
-    unsigned int* kaka = malloc(sizeof(unsigned int));  /* Malloc Test */
+    unsigned int* kaka  = malloc(sizeof(unsigned int));     /* Malloc Test */
+    unsigned int* cul   = malloc(4);                        //
+    unsigned int* prout = malloc(sizeof(unsigned int));     /*             */
+    *cul = 125125;
+    *prout = 8596;
     *kaka = 2000000000;
-    printf("var adr == %p\n", kaka);
+    if (cul == 0x00 || kaka == 0x00 || prout == 0x00){
+        printf("\033\x07[\033\x04WARN\033\x07]\033\x0F Malloc() returned 0! Check if your memory is functionnable.");
+    }
 
     replace_string(string, "Initialized keyboard.\n");
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s", string);
@@ -43,6 +50,7 @@ enum Return_codes_main main(){
     print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x1F, &position);
 
     next_entry(0);
+    free(kaka);
     return end_rcode;
 }
 
@@ -123,6 +131,6 @@ void init_heap(unsigned int total_RAM){
     write_string((unsigned char*)"ENTRY", (HEAP_START + 2));
     *(HEAP_START + 4) = 2;
     total_RAM -= (total_RAM % 4);
-    *(HEAP_START + 4) = total_RAM - (sizeof(unsigned int) * 4);
+    *(HEAP_START + 5) = total_RAM - (sizeof(unsigned int) * 4);
     return;
 }

@@ -12,6 +12,7 @@ void next_entry(int clear){
     print_string("--------------------------------------------------------------------------------Executed Terminal", 0x0F, &position);
 
     prompt(&position);
+    return;
 }
 
 /*struct output {
@@ -113,12 +114,6 @@ unsigned int parse(volatile unsigned int* position, const char* full_command){
     else if (compare_string(command, "clear")){
         clear_screen(position);
         return 0;
-    }
-    else if (compare_string(command, "rebootOS")){
-        clear_screen(position);
-        extern volatile unsigned int end_status;
-        end_status = 2;
-        return 1;
     }
     else {
         print_string("\nUnknown command: ", 0x0F, position);

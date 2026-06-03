@@ -1,7 +1,7 @@
 [BITS 32]
 
 global _start
-global end_status
+global freeze
 extern main
 extern clear_screen
 mov [0x10000], 0
@@ -12,35 +12,20 @@ _start:
 
     call main
 
-    cmp al, 0
-    je shutdown
-    cmp al, 2
-    je _start
+    jmp shutdown
 
+freeze:
     jmp $
 
 shutdown:
-    mov ecx, 0
     call clear_screen
     mov esi, end_string
+    mov ecx, 0
     call print_string
     sti
     hang:
         hlt         ; Set CPU as idle
         jmp hang    ; infinite loop for no triple fault
-
-rebootOS:
-    mov esi, 0
-    mov esi, Reboot_string
-    mov ecx, 0
-    str_loop:
-        cmp [esi], 0
-        je _start
-        mov al, [esi]
-        mov [0x10000+ecx], al
-        add ecx, 1
-        add esi, 1
-        jmp str_loop
 
 
 print_string:
@@ -61,5 +46,3 @@ return:
     ret
 
 end_string: db "The Kernel stopped running. Your CPU has been halted. It's now safe to turn off your computer!", 0
-end_status: db 0
-Reboot_string: db "Rebooted."
