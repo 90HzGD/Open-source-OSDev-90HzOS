@@ -83,7 +83,6 @@
                 *(ALLOC_ADR - 2) = 0;
             }
             unsigned int* next_adr = get_next_bloc(ALLOC_ADR);
-            printf("next_adr == %p\n", next_adr);
             if (*(next_adr - 2) == 0){
                 *(size_ptr) += *(next_adr - 1);
             }
@@ -135,6 +134,5 @@
     unsigned int* get_next_bloc(unsigned int* bloc){
         return (bloc-1)+(*(bloc-1)/4)+3;
     }
-
 
 #endif
