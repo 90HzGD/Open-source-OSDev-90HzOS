@@ -27,7 +27,6 @@ shutdown:
         hlt         ; Set CPU as idle
         jmp hang    ; infinite loop for no triple fault
 
-
 print_string:
     cmp byte [esi], 0
     je return

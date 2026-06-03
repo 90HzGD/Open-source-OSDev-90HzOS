@@ -122,7 +122,6 @@ outb:
     out dx, al              ; Set al value in out port
     ret
 
-
 ; Stack:
     ; 0: ret
     ; 4: arg1

@@ -6,7 +6,6 @@
     #define VGA_SCREEN_WIDTH        80
     #define VGA_SCREEN_HEIGHT       25
 
-
     #ifdef INCLUDE_FROM_KRNL
 
         #define KB_COMMAND              0x64

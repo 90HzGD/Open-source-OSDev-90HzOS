@@ -59,7 +59,6 @@ start:
 
     jmp Set_pm
 
-
 halt:
     call Print_string16
     hlt
@@ -163,7 +162,6 @@ RAMInfo_Buffer:
     .length_high:    dd 0
     .type:           dd 0
 RAMInfo_Buffer_End:
-
 
 Disk_Error: db "Disk Err", 0
 
