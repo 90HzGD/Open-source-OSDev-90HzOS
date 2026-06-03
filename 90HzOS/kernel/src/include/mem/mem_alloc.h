@@ -102,10 +102,14 @@
     unsigned int get_remain_heap_RAM(unsigned char mode){
         unsigned char status = *(HEAP_START);
         unsigned int size_offset = 0;
+        unsigned int size_offset_unused = 0;
         unsigned int ALLOC_IDX = 0;
         for (unsigned int i = 0; status != 2; ++i){
             status = *(HEAP_START + ALLOC_IDX + size_offset);
             size_offset += *(HEAP_START + ALLOC_IDX + size_offset + 1)/4;
+            if (status == 0){
+                size_offset_unused += *(HEAP_START + ALLOC_IDX + size_offset + 1);
+            }
             ALLOC_IDX += 1;
         }
         unsigned int remain_RAM = initRAMstruct.total_RAM;
@@ -114,7 +118,7 @@
             remain_RAM -= size_offset * 4 - ALLOC_IDX+1 - (unsigned int)HEAP_START;
         }
         else if (mode == 1){
-            remain_RAM -= ALLOC_IDX+1 - (unsigned int)HEAP_START;
+            remain_RAM -= (size_offset * 4 - ALLOC_IDX+1 - (unsigned int)HEAP_START) + size_offset_unused;
         }
         remain_RAM -= (remain_RAM % 4);
         return remain_RAM;
