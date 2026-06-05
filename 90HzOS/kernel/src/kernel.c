@@ -52,10 +52,7 @@ enum Return_codes_main main(){
     replace_string(string, "Initialized keyboard.\n");
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s", string);
 
-    replace_string(string, "Hello From 90HzOS!\n");
-    print_string(string, 0x4F, &position);
-
-    print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x1F, &position);
+    print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x01, &position);
 
     next_entry(0);
     return end_rcode;

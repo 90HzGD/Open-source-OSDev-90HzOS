@@ -15,13 +15,13 @@
     }
     
     void clear_screen(volatile unsigned int* position){
+        extern volatile unsigned int Times_Grid_moved;
         for (unsigned int i=0; i<(VGA_SCREEN_WIDTH*VGA_SCREEN_HEIGHT); ++i){
             *((unsigned char*)VRAM_CHAR_ADR+(i*2)) = 0;
             *((unsigned char*)VRAM_ATT_ADR+(i*2)) = 0x0F;
         }
-        if (*position >= 80*25){
-            *position -= (*position % 80);
-        }
+        *position = 0;
+        Times_Grid_moved = 0;
         return;
     }
 
