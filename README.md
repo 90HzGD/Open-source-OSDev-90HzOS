@@ -31,7 +31,7 @@ This is the begining of my project _90HzOS_. (Sorry for bad english) This projec
             - **print_string():**      prints a string with a given color and position to the screen thanks to the printchar() func
             - **print_char():**        prints a char to the screen with a given color and position
             - **clear_screen():**      clears the screen
-            - **setBG():**             change the background color with a given color
+            - **setBG():**             changes the background color with a given color
             - **change_color():**      changes the color of the background of a given single position (& given color)
             - **move_grid():**         moves the **VGA TEXT MODE** grid.
             - **And the longest one: printf() which is divided by other functions:**
@@ -48,12 +48,12 @@ This is the begining of my project _90HzOS_. (Sorry for bad english) This projec
     - ## **PS2 KEYBOARD FEATURES**
         - ## **KB DRIVER**
             - Some Low level keyboard driver functions:
-                - **init_idt():**             initialize the **Interrupt Descriptor table** _(idt)_ and calls load_idt()
+                - **init_idt():**             initializes the **Interrupt Descriptor table** _(idt)_ and calls load_idt()
                 - **load_idt():**             loads the idt with lidt instruction
                 - **kbinit():**               outbyte at 0x21: 0b11111101 (activates only keyboard)
                 - **enable_int():**           enables CPU interrupts (only keyboard for now)
-                - **keyboard_handler():**     set in idt, manage each input on the keyboard (such as pressed / released, toogles Shift on or off, same for Ctrl and Alt btw)
-                - **handle_keyboard():**      in kernel.c, manage the output of the keyboard, if 0x64 returns 1, the kernel talks to 0x60 to get the scancode, manages extended keys too.
+                - **keyboard_handler():**     set in idt, manages each input on the keyboard (such as pressed / released, toogles Shift on or off, same for Ctrl and Alt btw)
+                - **handle_keyboard():**      in kernel.c, manages the output of the keyboard, if 0x64 returns 1, the kernel talks to 0x60 to get the scancode, manages extended keys too.
         - ## **KEYBOARD DRIVER API**
             - Some functions to easily access to the keyboard activity via this **API**:
                 - **get_key():**           outputs scancode _(does not wait for you to press smt, returns 0 if None keys are pressed)_
