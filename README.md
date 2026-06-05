@@ -70,7 +70,7 @@ This is the begining of my project _90HzOS_. (Sorry for bad english) This projec
           - **get_remain_heap_RAM():**     _(mode=0)_: Outputs remaining RAM after **last bloc in HEAP** | _(mode=1)_ Outputs remaining available size in the **HEAP** _(counts unused bloc)_
           - **get_previous_bloc():**       Util used by free(), Outputs the data pointer of the previous bloc in the **HEAP** _(with a bloc data pointer as input)_
           - **get_next_bloc():**           Util used by free(), Outputs the bloc data pointer of the bloc next, to the _given bloc data pointer_ as input
-          - **init_bloc():**               Override the content of a given bloc data pointer, full of zeros
+          - **init_bloc():**               Overrides the content of a given bloc data pointer, full of zeros
     - ## **OTHER FUNCTIONS**:
         - **init_RAM():** describes in a struct, where the OS can write into RAM in several segments, associated with the length for each segment _(kernel.c func btw)_
 
