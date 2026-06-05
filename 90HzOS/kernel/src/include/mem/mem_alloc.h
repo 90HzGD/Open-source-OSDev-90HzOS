@@ -6,7 +6,7 @@
     void free(unsigned int* ALLOC_ADR);
     unsigned int get_remain_heap_RAM(unsigned char mode);
     unsigned int* get_previous_bloc(unsigned int* bloc);
-    unsigned int* get_next_bloc(unsigned int* bolc);
+    unsigned int* get_next_bloc(unsigned int* bloc);
     void init_bloc(unsigned int* ALLOC_ADR);                // Overrides bloc content w/ only zeros
 
     unsigned int* malloc(unsigned int size){
