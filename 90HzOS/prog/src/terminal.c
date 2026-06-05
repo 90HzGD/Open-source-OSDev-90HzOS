@@ -2,8 +2,11 @@
 #include "../../kernel/src/include/kernel.h"
 #include "../../kernel/src/include/string.h"
 #include "../../kernel/src/include/drivers/keyboard/kb_tools.h"
+#include "../../kernel/src/include/types.h"
 
 void next_entry(int clear){
+    init_builtin_commands();
+
     extern volatile unsigned int position;
     init_keys();
     if (clear >= 1){
@@ -12,6 +15,16 @@ void next_entry(int clear){
     print_string("--------------------------------------------------------------------------------Executed Terminal", 0x0F, &position);
 
     prompt(&position);
+    return;
+}
+
+void init_builtin_commands(){
+    builtin_commands.commands[0]        = "clear";
+    *(builtin_commands.needs_args)      = 0;
+    *(builtin_commands.arg_count_min)   = 0;
+    *(builtin_commands.arg_count_max)   = 0;
+
+    builtin_commands.commands[1]        = 0;
     return;
 }
 
@@ -99,25 +112,62 @@ void prompt(volatile unsigned int *position){
     }
 }
 
-unsigned int parse(volatile unsigned int* position, const char* full_command){
+unsigned int parse(volatile unsigned int* position, char* full_command){
     char command[256] = "";
     unsigned int com_idx = 0;
+    *(full_command + length(full_command)) = 0;
     while (com_idx != length(full_command) && *(full_command + com_idx) != ' '){
         *(command + com_idx) = *(full_command + com_idx);
         ++com_idx;
     }
     *(command + com_idx) = 0;
+    unsigned char* args[1024];
+    unsigned char argument[2048];
+    *args = 0;
+    *argument = 0;
+    unsigned int arg_idx = 0;
+    unsigned int args_idx = 0;
+    for (unsigned int i = 0; *(full_command + com_idx + i) != 0; ++i){
+        if (*(full_command + com_idx + i) != ' '){
+            *(argument + i) = *(full_command + com_idx + i);
+            ++arg_idx;
+            continue;
+        }
+        else {
+            *(argument + arg_idx) = 0;
+            *(args + args_idx) = argument;
+            arg_idx = 0;
+            ++args_idx;
+            *(args + args_idx) = 0;
+            continue;
+        }
+    }
 
+    unsigned int avail_com_idx = 0;
     if (compare_string(command, "\0")){
         return 0;
     }
-    else if (compare_string(command, "clear")){
-        clear_screen(position);
-        return 0;
-    }
     else {
-        print_string("\nUnknown command: ", 0x0F, position);
-        print_string(command, 0x04, position);
-        return 0;
+        enum boolean avail_command = 0;
+        for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
+            avail_command = compare_string(command, *(builtin_commands.commands + i));
+            if (avail_command){
+                avail_com_idx = i;
+                break;
+            }
+        }
+        if (!avail_command){
+            print_string("\nUnknown Command: ", 0x0F, position);
+            print_string(command, 0x04, position);
+            return 0;
+        }
+        if (!*(builtin_commands.needs_args + avail_com_idx) && length((char*)args) > 0){
+            print_char('\n', 0x0F, position);
+            print_string(command, 0x04, position);
+            print_string(": Takes No Argument!", 0x0F, position);
+            return 0;
+        }
+        clear_screen(position);
     }
+    return 0;
 }
