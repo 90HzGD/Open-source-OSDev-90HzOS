@@ -25,7 +25,7 @@ This is the begining of my project _90HzOS_. (Sorry for bad english) This projec
     - 90HzOS while shutted down via ^Q(Ctrl + Q)
 
 ## FEATURES
-- This OS features, by now, only really basic things:
+- This OS features, by now, only really basic **Features**:
     - ## **VGA FEATURES**:
         - The OS is working in **VGA TEXT MODE** 80*25 grid (not that good but idcare for now), so here are **VGA TEXT MODE** function in my OS:
             - **print_string():**      prints a string with a given color and position to the screen thanks to the printchar() func
