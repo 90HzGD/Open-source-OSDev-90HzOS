@@ -43,19 +43,6 @@ void init_builtin_commands(){
     return;
 }
 
-/*struct output {
-        unsigned char char1;
-        unsigned char char2;
-        unsigned char char3;
-        unsigned char char4;
-        unsigned char char5;
-        unsigned char char6;
-        unsigned char Altpressed;
-        unsigned char Ctrlpressed;
-        unsigned char ifchar;
-        unsigned char released;
-    };*/
-
 char* command_args[256];
 
 unsigned char prompt(volatile unsigned int *position){
@@ -82,7 +69,7 @@ unsigned char prompt(volatile unsigned int *position){
                     trans_key = transkey(key);
                 }
                 --*(position);
-                print_char(0, 0x00, position);
+                printf("\033\x00  \033\x0F");
                 struct command Command = parse(full_command);
                 if (Command.rcode != 0){
                     com_err(Command);
