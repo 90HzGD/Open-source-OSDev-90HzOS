@@ -4,6 +4,7 @@
     #define MOVE_GRID_BEGIN_ATT 0xB80A1
     #define MOVE_GRID_END 0xB8000 + (80*24)*2
 
+    void clear_screen();
     void printf(const char* string, ...);
     void print_integer(int integer, volatile unsigned int* position);
     void print_uinteger(unsigned int uinteger, volatile unsigned int* position);

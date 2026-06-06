@@ -5,6 +5,9 @@
 #include "../../kernel/src/include/types.h"
 #include "../../kernel/src/include/vga/stdio.h"
 
+unsigned char argument[2048];
+struct builtinCommands builtin_commands;
+
 void next_entry(int clear){
     init_builtin_commands();
 

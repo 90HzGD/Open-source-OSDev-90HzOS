@@ -6,8 +6,6 @@
     #define VGA_SCREEN_WIDTH        80
     #define VGA_SCREEN_HEIGHT       25
 
-    #ifdef INCLUDE_FROM_KRNL
-
         #define KB_COMMAND              0x64
         #define KB_DATA                 0x60
 
@@ -21,20 +19,14 @@
             unsigned int total_RAM;
         };
 
-        struct avail_RAM initRAMstruct;
-
-        int extended_key;
-
         enum Return_codes_main {
-            OK = 0,
+            _OK = 0,
         };
-    #endif
+
+    extern char kernel_end;
+    #define HEAP_START (unsigned int*)&kernel_end
         
-    void clear_screen();
-    void print_char(volatile const char displayed_char, const char attributes, volatile unsigned int *position);
-    void print_string(volatile const char *string, const char attributes,volatile  unsigned int *position);
-    void set_BGcolor(const char color);
-    void replace_string(volatile char *string, volatile char *target);
+    void init_heap(unsigned int total_RAM);
     enum Return_codes_main init_RAM();
 
     unsigned char handle_kb();

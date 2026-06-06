@@ -5,16 +5,16 @@
 #include "include/drivers/ports/ports.h"
 #include "include/types.h"
 #include "../../prog/src/include/terminal.h"
-#undef INCLUDE_FROM_KRNL
-extern char kernel_end;
-#define HEAP_START (unsigned int*)&kernel_end
+#include "include/string.h"
 #include "include/mem/mem_alloc.h"
+#undef INCLUDE_FROM_KRNL
 
-void init_heap(unsigned int total_RAM);
+struct avail_RAM initRAMstruct;
+int extended_key;
 
 enum Return_codes_main main(){
     extern void freeze();
-    enum Return_codes_main end_rcode = OK;
+    enum Return_codes_main end_rcode = _OK;
     
     unsigned int* main_ptr = (unsigned int*)&main;
     unsigned int main_pointer = (unsigned int)main_ptr;
@@ -80,7 +80,7 @@ unsigned char handle_kb(){
 }
 
 enum Return_codes_main init_RAM(){
-    enum Return_codes_main initRAMrcode = OK;
+    enum Return_codes_main initRAMrcode = _OK;
     printf("\033\x0CInitRAM Begin:\033\x0F\n");
     printf("Setting Usable RAM Segments:\n");
 

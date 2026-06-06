@@ -1,16 +1,12 @@
 #ifndef TERMINAL_H
     #define TERMINAL_H
 
-    #ifdef INCLUDE_FROM_KRNL
-        void next_entry(int clear);
-    #endif
+    void next_entry(int clear);
 
-    #ifndef INCLUDE_FROM_KRNL
         unsigned char prompt(volatile unsigned int *position);
         void init_builtin_commands();
         void clear();
         void help();
-        unsigned char argument[2048];
 
         struct builtinCommands {
             char*           commands[3];
@@ -20,8 +16,6 @@
             unsigned int    arg_count_max[3];
             char*           help[3];
         };
-
-        struct builtinCommands builtin_commands;
 
         enum commands_rcode{
             OK = 0,
@@ -44,6 +38,5 @@
         void com_err(struct command Com);
         extern void exec(unsigned int* com_adr, unsigned char** arguments);
         extern volatile unsigned int position;
-    #endif
 
 #endif
