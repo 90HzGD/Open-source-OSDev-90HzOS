@@ -15,7 +15,12 @@ void next_entry(int clear){
     if (clear >= 1){
         clear_screen();
     }
-    print_string("--------------------------------------------------------------------------------Executed Built-in shell", 0x0F, &position);
+    print_string("--------------------------------------------------------------------------------", 0x0F, &position);
+    unsigned char centerX = (80-length("Executed Built-in shell"))/2;
+    for (unsigned int i = 0; i != centerX; ++i){
+        print_char(' ', 0x00, &position);
+    }
+    printf("\033\16Executed Built-in shell\n\033\x0F");
     unsigned char ret = 0;
     while (!ret){
         ret = prompt(&position);
@@ -207,10 +212,10 @@ void clear(){
 }
 
 void help(){
-    print_string("\n=== [BUILTIN COMMANDS] ===", 0x06, &position);
+    printf("\n\033\x06============================== [BUILTIN COMMANDS] ==============================");
     for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
         printf("\n\033\x01%s\033\x0F: %s", *(builtin_commands.commands + i), *(builtin_commands.help + i));
     }
-    printf("\033\x06\n==========================\033\x0F");
+    printf("\n\n\033\x06================================================================================\033\x0F");
     return;
 }

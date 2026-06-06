@@ -124,7 +124,8 @@ extern struct avail_RAM initRAMstruct;
         unsigned int* old_adr = current_adr;
         do {
             old_adr = current_adr;
-            current_adr += *(++current_adr)/4;
+            ++current_adr;
+            current_adr += *(current_adr)/4;
             ++current_adr;
         } while (current_adr != bloc - 2);
         current_adr = old_adr+2;
