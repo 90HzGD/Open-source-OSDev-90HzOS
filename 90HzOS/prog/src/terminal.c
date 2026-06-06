@@ -19,12 +19,20 @@ void next_entry(int clear){
 }
 
 void init_builtin_commands(){
-    builtin_commands.commands[0]        = "clear";
+    builtin_commands.commands[0]        = "help";
+    *(builtin_commands.builtin_adr)     = (unsigned int*)&clear;
     *(builtin_commands.needs_args)      = 0;
     *(builtin_commands.arg_count_min)   = 0;
     *(builtin_commands.arg_count_max)   = 0;
+    builtin_commands.help[0]            = "Prints This help screen";
 
-    builtin_commands.commands[1]        = 0;
+    builtin_commands.commands[1]        = "clear";
+    *(builtin_commands.needs_args)      = 0;
+    *(builtin_commands.arg_count_min)   = 0;
+    *(builtin_commands.arg_count_max)   = 0;
+    builtin_commands.help[1]            = "Clears shell's screen";
+
+    builtin_commands.commands[2]        = 0;
     return;
 }
 
@@ -73,11 +81,11 @@ void prompt(volatile unsigned int *position){
                     --*(position);
                     print_char(0, 0x0F, position);
                 }
-                unsigned int rcode = parse(position, full_command);
-                if (rcode == 0){
-                    prompt(position);
+                struct command Command = parse(full_command);
+                if (Command.rcode != 0){
+                    com_err(Command);
                 }
-                return;
+                prompt(position);
             }
             else {
                 continue;
@@ -112,7 +120,11 @@ void prompt(volatile unsigned int *position){
     }
 }
 
-unsigned int parse(volatile unsigned int* position, char* full_command){
+struct command parse(char* full_command){
+    struct command Com;
+    replace_string(Com.full_command, full_command);
+    Com.rcode = OK;
+
     char command[256] = "";
     unsigned int com_idx = 0;
     *(full_command + length(full_command)) = 0;
@@ -120,13 +132,15 @@ unsigned int parse(volatile unsigned int* position, char* full_command){
         *(command + com_idx) = *(full_command + com_idx);
         ++com_idx;
     }
+
+    replace_string(Com.command, command);
     *(command + com_idx) = 0;
-    unsigned char* args[1024];
     unsigned char argument[2048];
-    *args = 0;
     *argument = 0;
+
     unsigned int arg_idx = 0;
     unsigned int args_idx = 0;
+
     for (unsigned int i = 0; *(full_command + com_idx + i) != 0; ++i){
         if (*(full_command + com_idx + i) != ' '){
             *(argument + i) = *(full_command + com_idx + i);
@@ -135,17 +149,17 @@ unsigned int parse(volatile unsigned int* position, char* full_command){
         }
         else {
             *(argument + arg_idx) = 0;
-            *(args + args_idx) = argument;
+            *(Com.arguments + args_idx) = argument;
             arg_idx = 0;
             ++args_idx;
-            *(args + args_idx) = 0;
+            *(Com.arguments + args_idx) = 0;
             continue;
         }
     }
 
     unsigned int avail_com_idx = 0;
     if (compare_string(command, "\0")){
-        return 0;
+        return Com;
     }
     else {
         enum boolean avail_command = 0;
@@ -157,17 +171,49 @@ unsigned int parse(volatile unsigned int* position, char* full_command){
             }
         }
         if (!avail_command){
-            print_string("\nUnknown Command: ", 0x0F, position);
-            print_string(command, 0x04, position);
-            return 0;
+            Com.rcode = Unknown;
+            return Com;
         }
-        if (!*(builtin_commands.needs_args + avail_com_idx) && length((char*)args) > 0){
-            print_char('\n', 0x0F, position);
-            print_string(command, 0x04, position);
-            print_string(": Takes No Argument!", 0x0F, position);
-            return 0;
+        if (!*(builtin_commands.needs_args + avail_com_idx) && length((char*)Com.arguments) > 0){
+            Com.rcode = Takes_No_Arg;
+            return Com;
         }
-        clear_screen(position);
     }
-    return 0;
+    return Com;
+}
+
+void com_err(struct command Com){
+    extern volatile unsigned int position;
+    switch (Com.rcode){
+        case 1:
+            print_string("\nUnknown Command: ", 0x0F, &position);
+            print_string(Com.command, 0x04, &position);
+            break;
+        case 2:
+            print_char('\n', 0x0F, &position);
+            print_string(Com.command, 0x04, &position);
+            print_string(": Takes No Argument!", 0x0F, &position);
+            break;
+        case 3:
+            print_char('\n', 0x0F, &position);
+            print_string(Com.command, 0x04, &position);
+            print_string(": Missing Argument(s).", 0x0F, &position);
+            break;
+        case 4:
+            print_char('\n', 0x0F, &position);
+            print_string(Com.command, 0x04, &position);
+            print_string(": Too Many Args were given.", 0x0F, &position);
+            break;
+        default:
+            return;
+    }
+    return;
+};
+
+void clear(){
+    return;
+}
+
+void help(){
+    return;
 }
