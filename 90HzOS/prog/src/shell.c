@@ -3,6 +3,7 @@
 #include "../../kernel/src/include/string.h"
 #include "../../kernel/src/include/drivers/keyboard/kb_tools.h"
 #include "../../kernel/src/include/types.h"
+#include "../../kernel/src/include/vga/stdio.h"
 
 void next_entry(int clear){
     init_builtin_commands();
@@ -11,7 +12,7 @@ void next_entry(int clear){
     if (clear >= 1){
         clear_screen();
     }
-    print_string("--------------------------------------------------------------------------------Executed Terminal", 0x0F, &position);
+    print_string("--------------------------------------------------------------------------------Executed Built-in shell", 0x0F, &position);
     unsigned char ret = 0;
     while (!ret){
         ret = prompt(&position);
@@ -55,8 +56,7 @@ void init_builtin_commands(){
 char* command_args[256];
 
 unsigned char prompt(volatile unsigned int *position){
-    print_string("\n[90HzOS@krnl]$ ", 0x0F, position);
-    print_char(0, 0xF0, position);
+    printf("\n[90HzOS@krnl]$ \033\xF0%c\033\x0F", 0);
     --*(position);
     struct output trans_key;
     unsigned char key=0;
@@ -78,13 +78,8 @@ unsigned char prompt(volatile unsigned int *position){
                     key = get_key();
                     trans_key = transkey(key);
                 }
-                if (command_pos == 0){
-                    print_char(0, 0x00, position);
-                }
-                else {
-                    --*(position);
-                    print_char(0, 0x0F, position);
-                }
+                --*(position);
+                print_char(0, 0x00, position);
                 struct command Command = parse(full_command);
                 if (Command.rcode != 0){
                     com_err(Command);
@@ -111,8 +106,7 @@ unsigned char prompt(volatile unsigned int *position){
             --*position;
             print_char(0, 0x00, position);
             *(position) = prompt_pos;
-            print_string(full_command, 0x0F, position);
-            print_char(0, 0xF0, position);
+            printf("%s\033\xF0%c\033\x0F", full_command, 0);
             continue;
         }
         if (!trans_key.released && trans_key.char1 != 0 && !trans_key.extended){
@@ -120,8 +114,7 @@ unsigned char prompt(volatile unsigned int *position){
             command_pos += 1;
             *(position) = prompt_pos;
             *(full_command + command_pos) = 0;
-            print_string(full_command, 0x0F, position);
-            print_char(0, 0xF0, position);
+            printf("%s\033\xF0%c\033\x0F", full_command, 0);
             continue;
         }
     }
@@ -201,23 +194,16 @@ struct command parse(char* full_command){
 void com_err(struct command Com){
     switch (Com.rcode){
         case 1:
-            print_string("\nUnknown Command: ", 0x0F, &position);
-            print_string(Com.command, 0x04, &position);
+        printf("\nUnknown command:\033\x04 %s\033\x0F", Com.command);
             break;
         case 2:
-            print_char('\n', 0x0F, &position);
-            print_string(Com.command, 0x04, &position);
-            print_string(": Takes No Argument!", 0x0F, &position);
+            printf("\n%s: \033\x04Takes No Argument.\033\x0F", Com.command);
             break;
         case 3:
-            print_char('\n', 0x0F, &position);
-            print_string(Com.command, 0x04, &position);
-            print_string(": Missing Argument(s).", 0x0F, &position);
+            printf("\n%s: \033\x04Missing Agument(s).\033\x0F", Com.command);
             break;
         case 4:
-            print_char('\n', 0x0F, &position);
-            print_string(Com.command, 0x04, &position);
-            print_string(": Too Many Args were given.", 0x0F, &position);
+            printf("\n%s: \033\x04Too Many Args Were Given.\033\x0F", Com.command);
             break;
         default:
             return;
@@ -231,12 +217,10 @@ void clear(){
 }
 
 void help(){
-    print_string("\n=== BUILTIN COMMANDS ===", 0x0F, &position);
+    print_string("\n=== [BUILTIN COMMANDS] ===", 0x06, &position);
     for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
-        print_char('\n', 0x00, &position);
-        print_string(*(builtin_commands.commands + i), 0x0F, &position);
-        print_string(": ", 0x0F, &position);
-        print_string(*(builtin_commands.help + i), 0x0F, &position);
+        printf("\n\033\x01%s\033\x0F: %s", *(builtin_commands.commands + i), *(builtin_commands.help + i));
     }
+    printf("\033\x06\n==========================\033\x0F");
     return;
 }
