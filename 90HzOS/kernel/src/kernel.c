@@ -19,10 +19,7 @@ enum Return_codes_main main(){
     unsigned int* main_ptr = (unsigned int*)&main;
     unsigned int main_pointer = (unsigned int)main_ptr;
 
-    extern volatile unsigned int position;
-    position = 0;
-
-    clear_screen(&position);
+    clear_screen();
     char string[] = "Booted into kernel entry at 0x100000!\n\t   In main C func in kernel:";
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s\033\x06 %p\033\x00\n", string, main_pointer);
 
@@ -51,6 +48,7 @@ enum Return_codes_main main(){
 
     replace_string(string, "Initialized keyboard.\n");
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s", string);
+    extern volatile unsigned int position;
 
     print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x01, &position);
 

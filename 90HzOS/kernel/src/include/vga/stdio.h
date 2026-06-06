@@ -15,13 +15,14 @@
         return;
     }
     
-    void clear_screen(volatile unsigned int* position){
+    void clear_screen(){
+        extern volatile unsigned int position;
         extern volatile unsigned int Times_Grid_moved;
         for (unsigned int i=0; i<(VGA_SCREEN_WIDTH*VGA_SCREEN_HEIGHT); ++i){
             *((unsigned char*)VRAM_CHAR_ADR+(i*2)) = 0;
             *((unsigned char*)VRAM_ATT_ADR+(i*2)) = 0x0F;
         }
-        *position = 0;
+        position = 0;
         Times_Grid_moved = 0;
         return;
     }
@@ -40,8 +41,7 @@
             }
         }
         else {
-            extern volatile unsigned int position;
-            clear_screen(&position);
+            clear_screen();
         }
     }
 
@@ -97,7 +97,7 @@
                 ++i;
                 switch (*(string + i)){
                     case 'c':
-                        clear_screen(&position);
+                        clear_screen();
                         break;
                     default:
                         Color = *(string + i);

@@ -30,7 +30,7 @@
         };
     #endif
         
-    void clear_screen(volatile unsigned int* position);
+    void clear_screen();
     void print_char(volatile const char displayed_char, const char attributes, volatile unsigned int *position);
     void print_string(volatile const char *string, const char attributes,volatile  unsigned int *position);
     void set_BGcolor(const char color);

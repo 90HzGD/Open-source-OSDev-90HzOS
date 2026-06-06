@@ -7,10 +7,9 @@
 void next_entry(int clear){
     init_builtin_commands();
 
-    extern volatile unsigned int position;
     init_keys();
     if (clear >= 1){
-        clear_screen(&position);
+        clear_screen();
     }
     print_string("--------------------------------------------------------------------------------Executed Terminal", 0x0F, &position);
 
@@ -19,18 +18,20 @@ void next_entry(int clear){
 }
 
 void init_builtin_commands(){
-    builtin_commands.commands[0]        = "help";
-    *(builtin_commands.builtin_adr)     = (unsigned int*)&clear;
-    *(builtin_commands.needs_args)      = 0;
-    *(builtin_commands.arg_count_min)   = 0;
-    *(builtin_commands.arg_count_max)   = 0;
-    builtin_commands.help[0]            = "Prints This help screen";
+    builtin_commands.commands[0]        = "clear";
+    builtin_commands.builtin_adr[0]     = (unsigned int*)&clear;
+    builtin_commands.needs_args[0]      = 0;
+    builtin_commands.arg_count_min[0]   = 0;
+    builtin_commands.arg_count_max[0]   = 0;
+    builtin_commands.help[0]            = "Clears shell's screen";
 
-    builtin_commands.commands[1]        = "clear";
-    *(builtin_commands.needs_args)      = 0;
-    *(builtin_commands.arg_count_min)   = 0;
-    *(builtin_commands.arg_count_max)   = 0;
-    builtin_commands.help[1]            = "Clears shell's screen";
+    builtin_commands.commands[1]        = "help";
+    builtin_commands.builtin_adr[1]     = (unsigned int*)&help;
+    builtin_commands.needs_args[1]      = 0;
+    builtin_commands.arg_count_min[1]   = 0;
+    builtin_commands.arg_count_max[1]   = 0;
+    builtin_commands.help[1]            = "Prints This help screen";
+
 
     builtin_commands.commands[2]        = 0;
     return;
@@ -85,6 +86,9 @@ void prompt(volatile unsigned int *position){
                 if (Command.rcode != 0){
                     com_err(Command);
                 }
+                else if (Command.com_adr != 0x00){
+                    exec(Command.com_adr, Command.arguments);
+                }
                 prompt(position);
             }
             else {
@@ -124,6 +128,7 @@ struct command parse(char* full_command){
     struct command Com;
     replace_string(Com.full_command, full_command);
     Com.rcode = OK;
+    Com.com_adr = 0x00;
 
     char command[256] = "";
     unsigned int com_idx = 0;
@@ -178,12 +183,20 @@ struct command parse(char* full_command){
             Com.rcode = Takes_No_Arg;
             return Com;
         }
+        else if (*(builtin_commands.needs_args + avail_com_idx) && length((char*)Com.arguments) > *(builtin_commands.arg_count_max + avail_com_idx)){
+            Com.rcode = Too_Many_Arg;
+            return Com;
+        }
+        else if (*(builtin_commands.needs_args + avail_com_idx) && length((char*)Com.arguments) < *(builtin_commands.arg_count_min + avail_com_idx)){
+            Com.rcode = Missing_Arg;
+            return Com;
+        }
     }
+    Com.com_adr = (unsigned int*)*(builtin_commands.builtin_adr + avail_com_idx);
     return Com;
 }
 
 void com_err(struct command Com){
-    extern volatile unsigned int position;
     switch (Com.rcode){
         case 1:
             print_string("\nUnknown Command: ", 0x0F, &position);
@@ -211,9 +224,17 @@ void com_err(struct command Com){
 };
 
 void clear(){
+    clear_screen();
     return;
 }
 
 void help(){
+    print_string("\n=== BUILTIN COMMANDS ===", 0x0F, &position);
+    for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
+        print_char('\n', 0x00, &position);
+        print_string(*(builtin_commands.commands + i), 0x0F, &position);
+        print_string(": ", 0x0F, &position);
+        print_string(*(builtin_commands.help + i), 0x0F, &position);
+    }
     return;
 }

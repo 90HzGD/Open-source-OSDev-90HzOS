@@ -7,10 +7,11 @@ all:
 	nasm -f elf ~/OSDev/90HzOS/kernel/src/entry.asm -o ~/OSDev/90HzOS/kernel/bin/build/entry.o
 	nasm -f elf ~/OSDev/90HzOS/kernel/src/drivers/ports/ports.asm -o ~/OSDev/90HzOS/kernel/bin/build/ports.o
 	nasm -f elf ~/OSDev/90HzOS/kernel/src/include/vga/local.asm -o ~/OSDev/90HzOS/kernel/bin/build/local_vga.o
+	nasm -f elf ~/OSDev/90HzOS/prog/src/shellUtil.asm -o ~/OSDev/90HzOS/prog/bin/build/shellUtil.o
 	i386-elf-gcc $(CFLAGS) -ffreestanding -m32 -g -c ~/OSDev/90HzOS/kernel/src/kernel.c -o ~/OSDev/90HzOS/kernel/bin/build/kernel.o
 	i386-elf-gcc $(CFLAGS) -ffreestanding -m32 -g -c ~/OSDev/90HzOS/kernel/src/drivers/keyboard/ps2.c -o ~/OSDev/90HzOS/kernel/bin/build/ps2.o
 	i386-elf-gcc $(CFLAGS) -ffreestanding -m32 -g -c ~/OSDev/90HzOS/prog/src/terminal.c -o ~/OSDev/90HzOS/prog/bin/build/terminal.o
-	i386-elf-ld -T linker.ld -o ~/OSDev/90HzOS/kernel/bin/full/kernel.bin ~/OSDev/90HzOS/kernel/bin/build/entry.o ~/OSDev/90HzOS/kernel/bin/build/ports.o ~/OSDev/90HzOS/kernel/bin/build/local_vga.o ~/OSDev/90HzOS/kernel/bin/build/kernel.o ~/OSDev/90HzOS/kernel/bin/build/ps2.o ~/OSDev/90HzOS/prog/bin/build/terminal.o --oformat binary -Map layout.map
+	i386-elf-ld -T linker.ld -o ~/OSDev/90HzOS/kernel/bin/full/kernel.bin ~/OSDev/90HzOS/kernel/bin/build/entry.o ~/OSDev/90HzOS/kernel/bin/build/ports.o ~/OSDev/90HzOS/kernel/bin/build/local_vga.o ~/OSDev/90HzOS/prog/bin/build/shellUtil.o ~/OSDev/90HzOS/kernel/bin/build/kernel.o ~/OSDev/90HzOS/kernel/bin/build/ps2.o ~/OSDev/90HzOS/prog/bin/build/terminal.o --oformat binary -Map layout.map
 	rm -f ~/OSDev/90HzOS/OS/90HzOS.bin
 	cat ~/OSDev/90HzOS/boot/bin/bootloader ~/OSDev/90HzOS/kernel/bin/full/kernel.bin > ~/OSDev/90HzOS/OS/90HzOS.bin
 	dd if=/dev/zero >> ~/OSDev/90HzOS/OS/90HzOS.bin count=32 bs=512
