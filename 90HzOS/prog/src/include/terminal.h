@@ -6,10 +6,11 @@
     #endif
 
     #ifndef INCLUDE_FROM_KRNL
-        void prompt(volatile unsigned int *position);
+        unsigned char prompt(volatile unsigned int *position);
         void init_builtin_commands();
         void clear();
         void help();
+        unsigned char argument[2048];
 
         struct builtinCommands {
             char*           commands[3];

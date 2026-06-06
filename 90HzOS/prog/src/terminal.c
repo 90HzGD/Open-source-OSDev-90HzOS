@@ -12,8 +12,10 @@ void next_entry(int clear){
         clear_screen();
     }
     print_string("--------------------------------------------------------------------------------Executed Terminal", 0x0F, &position);
-
-    prompt(&position);
+    unsigned char ret = 0;
+    while (!ret){
+        ret = prompt(&position);
+    }
     return;
 }
 
@@ -52,7 +54,7 @@ void init_builtin_commands(){
 
 char* command_args[256];
 
-void prompt(volatile unsigned int *position){
+unsigned char prompt(volatile unsigned int *position){
     print_string("\n[90HzOS@krnl]$ ", 0x0F, position);
     print_char(0, 0xF0, position);
     --*(position);
@@ -60,6 +62,7 @@ void prompt(volatile unsigned int *position){
     unsigned char key=0;
     unsigned Oldkey = key;
     char full_command[4096];
+    full_command[0] = 0;
     unsigned int command_pos = 0;
     unsigned int prompt_pos = *(position);
     while (1){
@@ -89,14 +92,14 @@ void prompt(volatile unsigned int *position){
                 else if (Command.com_adr != 0x00){
                     exec(Command.com_adr, Command.arguments);
                 }
-                prompt(position);
+                return 0;
             }
             else {
                 continue;
             }
         }
         if (trans_key.Ctrlpressed && trans_key.char1 == 'q'){
-            return;
+            return 1;
         }
         if (trans_key.char1 == '\x08' && !trans_key.released){
             unsigned int len = length(full_command);
@@ -140,7 +143,6 @@ struct command parse(char* full_command){
 
     replace_string(Com.command, command);
     *(command + com_idx) = 0;
-    unsigned char argument[2048];
     *argument = 0;
 
     unsigned int arg_idx = 0;
