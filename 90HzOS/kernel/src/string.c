@@ -8,7 +8,7 @@
         }
     }
 
-    void replace_string(volatile char *string, volatile char *target){
+    void replace_string(volatile char* string, volatile char* target){
         unsigned int index=0;
         do {
             *(string+index) = *(target+index);
@@ -20,6 +20,14 @@
     unsigned int length(volatile const char* string){
         int length = 0;
         for (unsigned int i=0; *(string+i)!='\0'; ++i){
+            length += 1;
+        }
+        return length;
+    }    
+    
+    unsigned int length_arrptr(char** string){
+        int length = 0;
+        for (unsigned int i=0; *(string+i) != 0x00; ++i){
             length += 1;
         }
         return length;

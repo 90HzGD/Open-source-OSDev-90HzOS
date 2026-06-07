@@ -1,6 +1,6 @@
 CFLAGS= -Wall -Wextra -Iinclude
 
-all:
+compile:
 	clear
 	mkdir -p ~/OSDev/90HzOS/kernel/src ~/OSDev/90HzOS/kernel/bin ~/OSDev/90HzOS/OS ~/OSDev/90HzOS/img ~/OSDev/90HzOS/boot/bin ~/OSDev/90HzOS/boot/src/vga ~/OSDev/90HzOS/kernel/bin/full ~/OSDev/90HzOS/kernel/bin/build ~/OSDev/90HzOS/prog/bin/build/ ~/OSDev/90HzOS/kernel/bin/build/vga ~/OSDev/90HzOS/kernel/src/mem/ ~/OSDev/90HzOS/kernel/bin/build/mem
 	nasm -f bin ~/OSDev/90HzOS/boot/src/boot.asm -o ~/OSDev/90HzOS/boot/bin/bootloader

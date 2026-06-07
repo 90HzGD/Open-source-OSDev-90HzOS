@@ -29,14 +29,14 @@
             unsigned int* com_adr;
             char full_command            [4096];
             char command                 [64];
-            unsigned char* arguments     [64];
+            char* arguments     [64];
             enum commands_rcode rcode;
         };
 
         struct command parse(char* full_command);
 
         void com_err(struct command Com);
-        extern void exec(unsigned int* com_adr, unsigned char** arguments);
+        extern void exec(unsigned int* com_adr, char** arguments);
         extern volatile unsigned int position;
 
 #endif

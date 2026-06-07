@@ -5,7 +5,7 @@
 #include "../../kernel/src/include/types.h"
 #include "../../kernel/src/include/vga/stdio.h"
 
-unsigned char argument[2048];
+char argument[2048];
 struct builtinCommands builtin_commands;
 
 void next_entry(int clear){
@@ -120,6 +120,7 @@ struct command parse(char* full_command){
     replace_string(Com.full_command, full_command);
     Com.rcode = OK;
     Com.com_adr = 0x00;
+    *(Com.arguments) = 0;
 
     char command[256] = "";
     unsigned int com_idx = 0;
@@ -132,13 +133,16 @@ struct command parse(char* full_command){
     replace_string(Com.command, command);
     *(command + com_idx) = 0;
     *argument = 0;
+    if (com_idx != length(full_command)){
+        ++com_idx;
+    }
 
     unsigned int arg_idx = 0;
     unsigned int args_idx = 0;
 
     for (unsigned int i = 0; *(full_command + com_idx + i) != 0; ++i){
         if (*(full_command + com_idx + i) != ' '){
-            *(argument + i) = *(full_command + com_idx + i);
+            *(argument + arg_idx) = *(full_command + com_idx + i);
             ++arg_idx;
             continue;
         }
@@ -150,6 +154,13 @@ struct command parse(char* full_command){
             *(Com.arguments + args_idx) = 0;
             continue;
         }
+    }
+    if (*(argument) != 0){
+        *(argument + arg_idx) = 0;
+        *(Com.arguments + args_idx) = argument;
+        arg_idx = 0;
+        ++args_idx;
+        *(Com.arguments + args_idx) = 0;
     }
 
     unsigned int avail_com_idx = 0;
@@ -169,15 +180,15 @@ struct command parse(char* full_command){
             Com.rcode = Unknown;
             return Com;
         }
-        if (!*(builtin_commands.needs_args + avail_com_idx) && length((char*)Com.arguments) > 0){
+        if (!*(builtin_commands.needs_args + avail_com_idx) && length_arrptr(Com.arguments) > 0){
             Com.rcode = Takes_No_Arg;
             return Com;
         }
-        else if (*(builtin_commands.needs_args + avail_com_idx) && length((char*)Com.arguments) > *(builtin_commands.arg_count_max + avail_com_idx)){
+        else if (*(builtin_commands.needs_args + avail_com_idx) && length_arrptr(Com.arguments) > *(builtin_commands.arg_count_max + avail_com_idx)){
             Com.rcode = Too_Many_Arg;
             return Com;
         }
-        else if (*(builtin_commands.needs_args + avail_com_idx) && length((char*)Com.arguments) < *(builtin_commands.arg_count_min + avail_com_idx)){
+        else if (*(builtin_commands.needs_args + avail_com_idx) && length_arrptr(Com.arguments) < *(builtin_commands.arg_count_min + avail_com_idx)){
             Com.rcode = Missing_Arg;
             return Com;
         }
@@ -189,7 +200,7 @@ struct command parse(char* full_command){
 void com_err(struct command Com){
     switch (Com.rcode){
         case 1:
-        printf("\nUnknown command:\033\x04 %s\033\x0F", Com.command);
+            printf("\nUnknown command:\033\x04 %s\033\x0F", Com.command);
             break;
         case 2:
             printf("\n%s: \033\x04Takes No Argument.\033\x0F", Com.command);
