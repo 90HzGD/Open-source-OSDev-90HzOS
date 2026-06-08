@@ -34,7 +34,7 @@ This is the begining of my project _90HzOS_. (Sorry for bad english) This projec
             - **setBG():**             changes the background color with a given color
             - **change_color():**      changes the color of the background of a given single position (& given color)
             - **move_grid():**         moves the **VGA TEXT MODE** grid.
-            - **And the longest one: printf() which is divided by other functions:**
+            - **And the longest one: printf() which is divided in other functions:**
                 - **printf():**             prints integers, unsigned integers, pointers, chars and strings inside of a given string with the sign: '%' in it, thanks to other functions
                 - **print_integer():**      prints an integer to screen
                 - **print_uinteger():**     prints an unsigned int to the screen
