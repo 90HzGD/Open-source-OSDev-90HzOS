@@ -43,8 +43,15 @@ void init_builtin_commands(){
     builtin_commands.arg_count_max[1]   = 0;
     builtin_commands.help[1]            = "Prints This help screen";
 
+    builtin_commands.commands[2]        = "echo";
+    builtin_commands.builtin_adr[2]     = (unsigned int*)&echo;
+    builtin_commands.needs_args[2]      = 1;
+    builtin_commands.arg_count_min[2]   = 1;
+    builtin_commands.arg_count_max[2]   = 2;
+    builtin_commands.help[2]            = "fait kaka";
 
-    builtin_commands.commands[2]        = 0;
+
+    builtin_commands.commands[3]        = 0;
     return;
 }
 
@@ -140,8 +147,19 @@ struct command parse(char* full_command){
     unsigned int arg_idx = 0;
     unsigned int args_idx = 0;
 
+    enum boolean str;
+
     for (unsigned int i = 0; *(full_command + com_idx + i) != 0; ++i){
-        if (*(full_command + com_idx + i) != ' '){
+        if (*(full_command + com_idx + i) != ' ' && !str){
+            if (*(full_command + com_idx + i) == '\"' || *(full_command + com_idx + i) == '\''){
+                if (str){
+                    str = False;
+                }
+                else {   
+                    str = True;
+                }
+                continue;
+            }
             *(argument + arg_idx) = *(full_command + com_idx + i);
             ++arg_idx;
             continue;
@@ -158,7 +176,6 @@ struct command parse(char* full_command){
     if (*(argument) != 0){
         *(argument + arg_idx) = 0;
         *(Com.arguments + args_idx) = argument;
-        arg_idx = 0;
         ++args_idx;
         *(Com.arguments + args_idx) = 0;
     }
@@ -180,15 +197,15 @@ struct command parse(char* full_command){
             Com.rcode = Unknown;
             return Com;
         }
-        if (!*(builtin_commands.needs_args + avail_com_idx) && length_arrptr(Com.arguments) > 0){
+        if (!*(builtin_commands.needs_args + avail_com_idx) && args_idx > 0){
             Com.rcode = Takes_No_Arg;
             return Com;
         }
-        else if (*(builtin_commands.needs_args + avail_com_idx) && length_arrptr(Com.arguments) > *(builtin_commands.arg_count_max + avail_com_idx)){
+        else if (*(builtin_commands.needs_args + avail_com_idx) && args_idx-1 > *(builtin_commands.arg_count_max + avail_com_idx)){
             Com.rcode = Too_Many_Arg;
             return Com;
         }
-        else if (*(builtin_commands.needs_args + avail_com_idx) && length_arrptr(Com.arguments) < *(builtin_commands.arg_count_min + avail_com_idx)){
+        else if (*(builtin_commands.needs_args + avail_com_idx) && args_idx-1 < *(builtin_commands.arg_count_min + avail_com_idx)){
             Com.rcode = Missing_Arg;
             return Com;
         }
@@ -228,5 +245,10 @@ void help(){
         printf("\n\033\x01%s\033\x0F: %s", *(builtin_commands.commands + i), *(builtin_commands.help + i));
     }
     printf("\n\n\033\x06================================================================================\033\x0F");
+    return;
+}
+
+void echo(char** arguments){
+    printf("%p", *arguments);
     return;
 }

@@ -13,9 +13,6 @@ struct avail_RAM initRAMstruct;
 int extended_key;
 
 enum Return_codes_main main(){
-    extern void freeze();
-    enum Return_codes_main end_rcode = _OK;
-    
     unsigned int* main_ptr = (unsigned int*)&main;
     unsigned int main_pointer = (unsigned int)main_ptr;
 
@@ -29,8 +26,8 @@ enum Return_codes_main main(){
     enable_int();
 
     unsigned int* test_malloc  = malloc(sizeof(unsigned int));     /* Malloc Test */
-    unsigned int* test_malloc0 = malloc(4);                        //
-    unsigned int* test_malloc1 = malloc(sizeof(unsigned int));     /*             */
+    unsigned int* test_malloc0 = malloc(4);                        //             //
+    unsigned int* test_malloc1 = malloc(sizeof(unsigned int));     /*_____________*/
     *test_malloc0 = 125125;
     *test_malloc1 = 8596;
     *test_malloc = 2000000000;
@@ -53,7 +50,7 @@ enum Return_codes_main main(){
     print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x01, &position);
 
     next_entry(0);
-    return end_rcode;
+    return _OK;
 }
 
 unsigned char handle_kb(){
@@ -80,6 +77,7 @@ unsigned char handle_kb(){
 }
 
 enum Return_codes_main init_RAM(){
+    extern void freeze();
     enum Return_codes_main initRAMrcode = _OK;
     printf("\033\x0CInitRAM Begin:\033\x0F\n");
     printf("Setting Usable RAM Segments:\n");
@@ -90,7 +88,7 @@ enum Return_codes_main init_RAM(){
 
     unsigned int*  base_ptr_val =  (unsigned int*)*baseptr; 
     unsigned int   length       =  *(len_ptr);
-    unsigned int   total_len    =  length;
+    unsigned int   total_len    =  0;
     unsigned int** arrBaseptr   =  initRAMstruct.baseptr;
     unsigned int*  arrLenptr    =  initRAMstruct.length;
 
@@ -109,6 +107,7 @@ enum Return_codes_main init_RAM(){
         total_len += length;
     }
 
+    //freeze();
     for (unsigned int i = 0; *(arrLenptr + i) != 0; ++i){
         printf("\t\033\6Chunk #%u : %p length: %u\tBytes\033\x0F\n", i, *(arrBaseptr + i), *(arrLenptr + i));
     }

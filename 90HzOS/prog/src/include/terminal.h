@@ -9,12 +9,12 @@
         void help();
 
         struct builtinCommands {
-            char*           commands[3];
-            unsigned int*   builtin_adr[3];
-            char            needs_args[3];
-            unsigned int    arg_count_min[3];
-            unsigned int    arg_count_max[3];
-            char*           help[3];
+            char*           commands[4];
+            unsigned int*   builtin_adr[4];
+            char            needs_args[4];
+            unsigned int    arg_count_min[4];
+            unsigned int    arg_count_max[4];
+            char*           help[4];
         };
 
         enum commands_rcode{
@@ -33,6 +33,7 @@
             enum commands_rcode rcode;
         };
 
+        void echo(char** arguments);
         struct command parse(char* full_command);
 
         void com_err(struct command Com);

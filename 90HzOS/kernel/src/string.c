@@ -1,4 +1,4 @@
-#include "include/string.h"    
+#include "include/string.h" 
     void reverse_string(char* string){
         char* string_cpy = 0;
         unsigned int str_len = length(string);
@@ -24,14 +24,6 @@
         }
         return length;
     }    
-    
-    unsigned int length_arrptr(char** string){
-        int length = 0;
-        for (unsigned int i=0; *(string+i) != 0x00; ++i){
-            length += 1;
-        }
-        return length;
-    }
 
     int compare_string(volatile const char* string1, volatile const char* string2){
         unsigned int len1 = length(string1);

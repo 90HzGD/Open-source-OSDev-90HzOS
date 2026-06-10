@@ -9,8 +9,8 @@
         #define KB_COMMAND              0x64
         #define KB_DATA                 0x60
 
-        #define BASE_PTR_INITRAM        0x8000
-        #define LENGTH_INITRAM          0x9000
+        #define BASE_PTR_INITRAM        0x4000
+        #define LENGTH_INITRAM          0x5000
 
         struct avail_RAM {
             unsigned int* baseptr[64];

@@ -1,53 +1,33 @@
+[ORG 0x5500]
 [BITS 16]
-[org 0x7c00]
-
-_start:
-    jmp short start
-    nop
 
 CODE_SEG equ 0x8
 DATA_SEG equ 0x10
 
-Kernel_adr equ 0x1000
+Kernel_adr equ 0x8000
 Kernel_Destination equ 0x100000
-BOOT_DISK: db 0
+
 LOAD_BYTES: dd 0
 
-Usable_RAMSpace_Baseptr equ 0x8000
-Usable_RAMSpace_length  equ 0x9000
+Usable_RAMSpace_Baseptr equ 0x4000
+Usable_RAMSpace_length  equ 0x5000
 
 Sectors_load_nbr: db 0
+BOOT_DISK: db 0
 
-%define STACK_ADR 0x9000
-
-start:
+_start:
+    mov [BOOT_DISK], dl
     cli
-    ; Setup stack
     xor ax, ax
-    mov ss, ax
     mov ds, ax
     mov es, ax
-    mov gs, ax
-    mov bp, STACK_ADR
-    mov sp, bp
     sti
 
-    mov [BOOT_DISK], dl
-    xor ax, ax
-    int 0x13
-    jc halt
-
-    mov ah, 0x02
-    mov dh, 0x00
-    mov ch, 0x00
-    mov bx, Kernel_adr
-    mov cl, 0x02
-    mov al, 0x20
-    mov [Sectors_load_nbr], al
+    mov ah, 0x42
     mov dl, [BOOT_DISK]
+    mov si, DAP_kernel
     int 0x13
-
-    mov si, Disk_Error
+    mov si, Disk_ERRstr
     jc halt
     mov si, 0
 
@@ -61,8 +41,22 @@ start:
 
 halt:
     call Print_string16
-    hlt
-    jmp $                   ; Infinite loop for no crashes
+    hang:
+        hlt
+        jmp hang
+
+Print_string16:
+    cmp [si], 0
+    je return_str16
+    jmp Print_char16
+Print_char16:
+    mov ah, 0x0E
+    mov al, [si]
+    int 0x10
+    add si, 1
+    jmp Print_string16
+return_str16:
+    ret
 
 GDT_Start:
     NULL_Descriptor:
@@ -96,20 +90,6 @@ Set_pm:
     mov cr0, eax
     jmp CODE_SEG:Protected_Mode
 
-VRAM_ADR32 equ 0xB8000
-
-Print_string16:
-    cmp [si], 0
-    je return_str16
-    jmp Print_char16
-Print_char16:
-    mov ah, 0x0E
-    mov al, [si]
-    int 0x10
-    add si, 1
-    jmp Print_string16
-return_str16:
-    ret
 
 Get_RAM_Info:
     mov ebx, 0
@@ -153,7 +133,8 @@ RAM_Error:
         hlt
         jmp RAM_Error.Err_loop
 
-RAM_ERRstr: db "RAM Err", 0
+RAM_ERRstr: db "RAM Error.", 0
+Disk_ERRstr: db "Disk Error.", 0
 
 RAMInfo_Buffer:
     .base_low:       dd 0
@@ -162,10 +143,20 @@ RAMInfo_Buffer:
     .length_high:    dd 0
     .type:           dd 0
 RAMInfo_Buffer_End:
+    
 
-Disk_Error: db "Disk Err", 0
+DAP_kernel:
+    .size:      db 0x10
+    .reserved:  db 0x00
+    .sectors:   dw 0x20
+    .offset:    dw 0x8000
+    .segment:   dw 0x0000
+    .lba:       dq 2050
 
 [BITS 32]
+
+VRAM_ADR32 equ 0xB8000
+
 Protected_Mode:
     ; Init stack
     mov ax, DATA_SEG
@@ -173,7 +164,7 @@ Protected_Mode:
     mov ss, ax
     mov gs, ax
     mov ds, ax
-    mov esp, 0x9000
+    mov esp, 0x9FFFF
     mov ebp, esp
 
     mov esi, Loading_string
@@ -182,11 +173,9 @@ Protected_Mode:
 
     mov ecx, 0
     mov eax, 0
+    mov byte [Sectors_load_nbr], 0x20
     call Multiply
     call Move_Kernel
-
-    mov esp, 0x900000
-    mov ebp, esp
 
     jmp CODE_SEG:Kernel_Destination
 
@@ -224,7 +213,6 @@ Print_charPM:
 return_str:
     ret
 
-Loading_string: db "Loading Kernel", 0
+Loading_string: db "Loading Kernel...", 0
 
-times 510-($-$$) db 0
-dw 0xAA55
+times 1024 - ($-$$) db 0

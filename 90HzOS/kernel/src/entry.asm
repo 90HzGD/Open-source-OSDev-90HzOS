@@ -4,7 +4,6 @@ global _start
 global freeze
 extern main
 extern clear_screen
-mov [0x10000], 0
 
 _start:
     mov eax, 0
