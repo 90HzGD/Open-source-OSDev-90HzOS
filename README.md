@@ -1,4 +1,4 @@
-## Open Source OSDev Project made by a random GD French Player btw
+## Open Source OSDev Project made by a random French guy
 This is the begining of my project _90HzOS_. (Sorry for bad english) This project **IS NOT PROFESSIONAL**
 
 ## GO TO
