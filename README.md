@@ -20,8 +20,9 @@ This project **IS NOT PROFESSIONAL**
     - [How to run on QEMU](#how-to-run-on-qemu)
     - [How to run on VirtualBox](#how-to-run-on-virtualbox)
 
-## OS Screenshots
+## OS Pictures
 - ![OS Running on real hardware](pictures/realPC.png)
+    - 90HzOS while running on **real hardware** _(PC ref: Samsung NP300E5A-S04FR)_
 - ![OS Running](pictures/90HzOS.png)
     - 90HzOS while running
 - ![OS shutted down](pictures/shutdown.png)
