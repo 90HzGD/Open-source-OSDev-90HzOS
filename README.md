@@ -1,5 +1,7 @@
 ## Open Source OSDev Project made by a random French guy
-This is the begining of my project _90HzOS_. (Sorry for bad english) This project **IS NOT PROFESSIONAL**
+This is the begining of my project _90HzOS_. (Sorry for bad english) 
+Which even runs on REAL COMPUTER
+This project **IS NOT PROFESSIONAL**
 
 ## GO TO
 **Click Where you want to go!**
