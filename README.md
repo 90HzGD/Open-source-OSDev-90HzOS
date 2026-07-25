@@ -21,6 +21,7 @@ This project **IS NOT PROFESSIONAL**
     - [How to run on VirtualBox](#how-to-run-on-virtualbox)
 
 ## OS Screenshots
+- ![OS Running on real hardware](pictures/realPC.png)
 - ![OS Running](pictures/90HzOS.png)
     - 90HzOS while running
 - ![OS shutted down](pictures/shutdown.png)
