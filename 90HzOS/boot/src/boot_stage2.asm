@@ -9,8 +9,9 @@ Kernel_Destination equ 0x100000
 
 LOAD_BYTES: dd 0
 
-Usable_RAMSpace_Baseptr equ 0x4000
-Usable_RAMSpace_length  equ 0x5000
+Usable_RAMSpace_Baseptr equ 0x4004
+Usable_RAMSpace_length  equ 0x5004
+esi_debug: dd 0
 
 Sectors_load_nbr: db 0
 BOOT_DISK: db 0
@@ -92,6 +93,8 @@ Set_pm:
 
 
 Get_RAM_Info:
+    mov eax, 0
+    push eax
     mov ebx, 0
     mov esi, 0
     RAMInfo_loop:
@@ -113,14 +116,28 @@ Get_RAM_Info:
         mov eax, [RAMInfo_Buffer.base_low]
         jmp Update_URAMBaseptr
     Update_URAMBaseptr:
+        mov dword [Usable_RAMSpace_Baseptr + esi], 0
+        mov dword [Usable_RAMSpace_Baseptr + esi + 2], 0
+
         mov [Usable_RAMSpace_Baseptr + esi], eax
         mov eax, [RAMInfo_Buffer.length_low]
+
+        mov dword [Usable_RAMSpace_length + esi], 0
+        mov dword [Usable_RAMSpace_length + esi + 2], 0
+
         mov [Usable_RAMSpace_length + esi], eax
+        pop eax
+        inc eax
+        push eax
         add esi, 0x04
         jmp RAMInfo_loop
     RAM_Info_return:
-        mov [Usable_RAMSpace_Baseptr + esi], 0
-        mov [Usable_RAMSpace_length + esi], 0
+        mov dword [Usable_RAMSpace_Baseptr + esi], 0
+        mov dword [Usable_RAMSpace_length + esi], 0
+        mov dword [Usable_RAMSpace_Baseptr + esi + 2], 0
+        mov dword [Usable_RAMSpace_length + esi + 2], 0
+        pop eax
+        mov [0x4000], eax
         mov esi, 0
         mov eax, 0
         ret
@@ -143,7 +160,6 @@ RAMInfo_Buffer:
     .length_high:    dd 0
     .type:           dd 0
 RAMInfo_Buffer_End:
-    
 
 DAP_kernel:
     .size:      db 0x10

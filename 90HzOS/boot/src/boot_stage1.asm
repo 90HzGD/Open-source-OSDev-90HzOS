@@ -71,9 +71,7 @@ return_str16:
     ret
 
 Disk_Error: db "Disk Error.", 0
-;db 0
 Begin_string: db "In bootloader...", 0
-;db 0
 Pass_string: db "Loaded stage2", 0
 
 times 446-($-$$) db 0

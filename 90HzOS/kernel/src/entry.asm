@@ -43,4 +43,4 @@ return:
     mov eax, 0
     ret
 
-end_string: db "The Kernel stopped running. Your CPU has been halted. It's now safe to turn off your computer!", 0
+end_string: db "What? U want to turn off ur computer? Do it yourself what do you mean xD        (Its now safe to turn off your computer)", 0

@@ -17,6 +17,7 @@ enum Return_codes_main main(){
     unsigned int main_pointer = (unsigned int)main_ptr;
 
     clear_screen();
+
     char string[] = "Booted into kernel entry at 0x100000!\n\t   In main C func in kernel:";
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s\033\x06 %p\033\x00\n", string, main_pointer);
 
@@ -92,7 +93,7 @@ enum Return_codes_main init_RAM(){
     unsigned int** arrBaseptr   =  initRAMstruct.baseptr;
     unsigned int*  arrLenptr    =  initRAMstruct.length;
 
-    for (unsigned int i = 0; length != 0; ++i){
+    for (unsigned int i = 0; i != *((unsigned int*)0x4000); ++i){
         length                  = *(len_ptr + i);
 
         base_ptr_val            =  (unsigned int*)*baseptr;
@@ -107,8 +108,7 @@ enum Return_codes_main init_RAM(){
         total_len += length;
     }
 
-    //freeze();
-    for (unsigned int i = 0; *(arrLenptr + i) != 0; ++i){
+    for (unsigned int i = 0; i != *((unsigned int*)0x4000); ++i){
         printf("\t\033\6Chunk #%u : %p length: %u\tBytes\033\x0F\n", i, *(arrBaseptr + i), *(arrLenptr + i));
     }
     printf("Total Usable RAM:\033\x06 %u bytes\033\x0F\n", total_len);

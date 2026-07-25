@@ -123,7 +123,7 @@
                         *(stringf + str_idx) = 0;
                         print_string(stringf, Color, &position); 
                         break;
-                    case 'p':
+                    case 'p':case 'h':
                         const unsigned int* int_ptr = (unsigned int*)*(var_arg_ptr);
                         print_hex(int_ptr, &position);
                         break;
@@ -373,12 +373,11 @@
 
             *(ptr_string + 8) = 0;
             unsigned char offset = 0;
-
+            
             for (unsigned int i = 0; i != (8-hex_len); ++i){
                 *(ptr_string + i) = 48;
                 offset += 1;
             }
-
             unsigned int index = 0;
 
             for (unsigned int i = 0; conv_ptr >= 1; ++i){
