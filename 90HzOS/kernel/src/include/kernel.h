@@ -30,5 +30,6 @@
     enum Return_codes_main init_RAM();
 
     unsigned char handle_kb();
+    extern char* Get_CPU_name(void);
 
 #endif

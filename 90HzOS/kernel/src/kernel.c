@@ -26,9 +26,9 @@ enum Return_codes_main main(){
     kb_init();
     enable_int();
 
-    unsigned int* test_malloc  = malloc(sizeof(unsigned int));     /* Malloc Test */
-    unsigned int* test_malloc0 = malloc(4);                        //             //
-    unsigned int* test_malloc1 = malloc(sizeof(unsigned int));     /*_____________*/
+    unsigned int* test_malloc  = (unsigned int*)malloc(sizeof(unsigned int));     /* Malloc Test */
+    unsigned int* test_malloc0 = (unsigned int*)malloc(4);                        //             //
+    unsigned int* test_malloc1 = (unsigned int*)malloc(sizeof(unsigned int));     /*_____________*/
     *test_malloc0 = 125125;
     *test_malloc1 = 8596;
     *test_malloc = 2000000000;
@@ -47,6 +47,8 @@ enum Return_codes_main main(){
     replace_string(string, "Initialized keyboard.\n");
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s", string);
     extern volatile unsigned int position;
+    char* CPU_name = Get_CPU_name();
+    printf("CPU: %s\n", CPU_name);
 
     print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x01, &position);
 
@@ -117,7 +119,7 @@ enum Return_codes_main init_RAM(){
     // Heap start
 
     initRAMstruct.heap_begin    = (unsigned int*)&kernel_end;
-    initRAMstruct.total_RAM     = total_len;
+    initRAMstruct.total_RAM     = total_len - kernel_end;
     printf("Set Kernel Heap to: \033\x06%p\033\x0F\n", initRAMstruct.heap_begin);
     init_heap(total_len);
 

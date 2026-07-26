@@ -1,10 +1,11 @@
 #include "../include/mem/mem_alloc.h" 
 #include "../include/kernel.h"
 #include "../include/types.h"
+#include "../include/vga/stdio.h"
 
 extern struct avail_RAM initRAMstruct;
 
-    unsigned int* malloc(unsigned int size){
+    char* malloc(unsigned int size){
         // Invalid Size
         if (size == 0){
             return 0x0;
@@ -44,7 +45,7 @@ extern struct avail_RAM initRAMstruct;
             ++ALLOC_IDX;
 
         } while (ret == 0);
-        return ret;
+        return (char*)ret;
     }
 
     void free(unsigned int* ALLOC_ADR){
@@ -141,4 +142,23 @@ extern struct avail_RAM initRAMstruct;
             *(ALLOC_ADR + i) = 0;
         }
         return;
+    }
+
+    char* alloc_str(char* str){
+        unsigned int i = 0, len = 0;
+        if (!*str){
+            return 0x00;
+        }
+        for (;*(str + len) != 0; ++len){
+            continue;
+        }
+        char* alloc = malloc(sizeof(char) * len + 1);
+        if (!alloc){
+            return 0x00;
+        }
+        for (;i != len; ++i){
+            *(alloc + i) = *(str + i);
+        }
+        *(alloc + len) = 0;
+        return alloc;
     }

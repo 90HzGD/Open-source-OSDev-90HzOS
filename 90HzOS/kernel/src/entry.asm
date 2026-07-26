@@ -2,6 +2,7 @@
 
 global _start
 global freeze
+global Get_CPU_name
 extern main
 extern clear_screen
 
@@ -15,6 +16,32 @@ _start:
 
 freeze:
     jmp $
+
+Get_CPU_name:
+    pushad
+    mov eax, 0x80000002
+    mov esi, CPUName_str
+    ._loop:
+        cmp eax, 0x80000004
+        ja Get_CPU_name.end
+        push eax
+        cpuid
+        mov [esi], eax
+        add esi, 4
+        mov [esi], ebx
+        add esi, 4
+        mov [esi], ecx
+        add esi, 4
+        mov [esi], edx
+        pop eax
+        inc eax
+        jmp Get_CPU_name._loop
+    .end:
+    popad
+    mov eax, CPUName_str
+    ret
+
+CPUName_str: dq 0,0,0,0,0,0
 
 shutdown:
     call clear_screen

@@ -4,6 +4,7 @@
 #include "../../kernel/src/include/drivers/keyboard/kb_tools.h"
 #include "../../kernel/src/include/types.h"
 #include "../../kernel/src/include/vga/stdio.h"
+#include "../../kernel/src/include/mem/mem_alloc.h"
 
 char argument[2048];
 struct builtinCommands builtin_commands;
@@ -47,7 +48,7 @@ void init_builtin_commands(){
     builtin_commands.builtin_adr[2]     = (unsigned int*)&echo;
     builtin_commands.needs_args[2]      = 1;
     builtin_commands.arg_count_min[2]   = 1;
-    builtin_commands.arg_count_max[2]   = 2;
+    builtin_commands.arg_count_max[2]   = 0;
     builtin_commands.help[2]            = "fait kaka";
 
 
@@ -88,6 +89,12 @@ unsigned char prompt(volatile unsigned int *position){
                 }
                 else if (Command.com_adr != 0x00){
                     exec(Command.com_adr, Command.arguments);
+                }
+                if (!compare_string(Command.command, "clear") || Command.rcode != 0){
+                    if (!Command.rcode){
+                        printf("\n");
+                    }
+                    printf("Executed with rcode: \033\x03%u\033\x0F", Command.rcode);
                 }
                 return 0;
             }
@@ -132,107 +139,78 @@ struct command parse(char* full_command){
     char command[256] = "";
     unsigned int com_idx = 0;
     *(full_command + length(full_command)) = 0;
-    while (com_idx != length(full_command) && *(full_command + com_idx) != ' '){
+
+    while (com_idx != length(full_command) && *(full_command + com_idx) != ' ' && com_idx < 63){
         *(command + com_idx) = *(full_command + com_idx);
         ++com_idx;
     }
-
-    replace_string(Com.command, command);
-    *(command + com_idx) = 0;
-    *argument = 0;
-    if (com_idx != length(full_command)){
-        ++com_idx;
-    }
-
-    unsigned int arg_idx = 0;
     unsigned int args_idx = 0;
+    {
+        *(command + com_idx) = 0;
+        ++com_idx;
+        unsigned int bypass_arg_parse = (com_idx >= length(full_command));
+        replace_string(Com.command, command);
+        *argument = 0;
 
-    enum boolean str;
-
-    for (unsigned int i = 0; *(full_command + com_idx + i) != 0; ++i){
-        if (*(full_command + com_idx + i) != ' ' && !str){
-            if (*(full_command + com_idx + i) == '\"' || *(full_command + com_idx + i) == '\''){
-                if (str){
-                    str = False;
+        if (!bypass_arg_parse){
+            char allow_spaces = 0;
+            char* arg = 0;
+            unsigned int i = 0;
+            char* str_target;
+            for (;com_idx != length(full_command) || args_idx >= 63; ++com_idx){
+                if ((*(full_command + com_idx) != ' ' || allow_spaces) && com_idx != length(full_command) && *(full_command + com_idx) != '\"' && *(full_command + com_idx) != '\''){
+                    *(arg + i) = *(full_command + com_idx);
+                    ++i;
                 }
-                else {   
-                    str = True;
+                else if (*(full_command + com_idx) != '\"' || *(full_command + com_idx) != '\''){
+                    allow_spaces = (allow_spaces ^ 1);
+                    continue;
                 }
-                continue;
+                else {
+                    *(arg + i) = 0;
+                    i = 0;
+                    str_target = alloc_str(arg);
+                    if (!str_target){
+                        *arg = 0;
+                        i = 0;
+                        continue;
+                    }
+                    *(Com.arguments + args_idx) = str_target;
+                    *arg = 0;
+                    ++args_idx;
+                    *(Com.arguments + args_idx) = 0;
+                }
             }
-            *(argument + arg_idx) = *(full_command + com_idx + i);
-            ++arg_idx;
-            continue;
-        }
-        else {
-            *(argument + arg_idx) = 0;
-            *(Com.arguments + args_idx) = argument;
-            arg_idx = 0;
+            *(arg+i) = 0;
+            str_target = alloc_str(arg);
+            *(Com.arguments + args_idx) = str_target;
             ++args_idx;
             *(Com.arguments + args_idx) = 0;
-            continue;
         }
     }
-    if (*(argument) != 0){
-        *(argument + arg_idx) = 0;
-        *(Com.arguments + args_idx) = argument;
-        ++args_idx;
-        *(Com.arguments + args_idx) = 0;
+    int idx = -1;
+    unsigned int Com_exists = in_str_arr(builtin_commands.commands, command);
+    if (!Com_exists){
+        Com.rcode = Unknown;
     }
-
-    unsigned int avail_com_idx = 0;
-    if (compare_string(command, "\0")){
-        return Com;
+    else{
+        idx = search_str_arr(builtin_commands.commands, Com.command);
+        Com.com_adr = *(builtin_commands.builtin_adr + idx);
     }
-    else {
-        enum boolean avail_command = 0;
-        for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
-            avail_command = compare_string(command, *(builtin_commands.commands + i));
-            if (avail_command){
-                avail_com_idx = i;
-                break;
-            }
-        }
-        if (!avail_command){
-            Com.rcode = Unknown;
-            return Com;
-        }
-        if (!*(builtin_commands.needs_args + avail_com_idx) && args_idx > 0){
+    if (idx >= 0){
+        if (!*(builtin_commands.needs_args + idx) && args_idx > 0){
             Com.rcode = Takes_No_Arg;
-            return Com;
         }
-        else if (*(builtin_commands.needs_args + avail_com_idx) && args_idx-1 > *(builtin_commands.arg_count_max + avail_com_idx)){
-            Com.rcode = Too_Many_Arg;
-            return Com;
-        }
-        else if (*(builtin_commands.needs_args + avail_com_idx) && args_idx-1 < *(builtin_commands.arg_count_min + avail_com_idx)){
+        else if (*(builtin_commands.needs_args + idx) && *(builtin_commands.arg_count_min + idx) > args_idx){
             Com.rcode = Missing_Arg;
-            return Com;
+        }
+        else if (*(builtin_commands.needs_args + idx) && *(builtin_commands.arg_count_max + idx) < args_idx && *(builtin_commands.arg_count_max + idx) != 0){
+            Com.rcode = Too_Many_Arg;
         }
     }
-    Com.com_adr = (unsigned int*)*(builtin_commands.builtin_adr + avail_com_idx);
+    
     return Com;
-}
-
-void com_err(struct command Com){
-    switch (Com.rcode){
-        case 1:
-            printf("\nUnknown command:\033\x04 %s\033\x0F", Com.command);
-            break;
-        case 2:
-            printf("\n%s: \033\x04Takes No Argument.\033\x0F", Com.command);
-            break;
-        case 3:
-            printf("\n%s: \033\x04Missing Agument(s).\033\x0F", Com.command);
-            break;
-        case 4:
-            printf("\n%s: \033\x04Too Many Args Were Given.\033\x0F", Com.command);
-            break;
-        default:
-            return;
-    }
-    return;
-};
+}  
 
 void clear(){
     clear_screen();
@@ -240,15 +218,39 @@ void clear(){
 }
 
 void help(){
-    printf("\n\033\x06============================== [BUILTIN COMMANDS] ==============================");
+    printf("\n\033\x06============================== [BUILTIN COMMANDS] =============================");
     for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
         printf("\n\033\x01%s\033\x0F: %s", *(builtin_commands.commands + i), *(builtin_commands.help + i));
     }
-    printf("\n\n\033\x06================================================================================\033\x0F");
+    printf("\n\033\x06===============================================================================\033\x0F");
     return;
 }
 
 void echo(char** arguments){
-    printf("%p", *arguments);
+    printf("\n");
+    for (unsigned int i = 0; *(arguments + i) != 0; ++i){
+        printf("%s", *(arguments + i));
+    }
+    return;
+}
+
+void com_err(struct command Com){
+    printf("\n\033\x07[\033\4FAIL\033\x07]\033\x0F ");
+    switch (Com.rcode){
+        case Unknown:
+            printf("Unknown command: \033\x04%s\033\x0F\n", Com.command);
+            break;
+        case Takes_No_Arg:
+            printf("%s: \033\x04Takes no argument.\033\x0F\n", Com.command);
+            break;
+        case Missing_Arg:
+            printf("%s: \033\x04Too few arguments were given.\033\x0F\n", Com.command);
+            break;
+        case Too_Many_Arg:
+            printf("%s: \033\x04Too many arguments were given.\033\x0F\n", Com.command);
+            break;
+        default:
+            break;
+    }
     return;
 }

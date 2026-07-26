@@ -27,9 +27,9 @@
 
         struct command {
             unsigned int* com_adr;
-            char full_command            [4096];
-            char command                 [64];
-            char* arguments     [64];
+            char full_command               [4096];
+            char command                    [64];
+            char* arguments                 [256];
             enum commands_rcode rcode;
         };
 

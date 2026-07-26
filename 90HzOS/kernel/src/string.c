@@ -1,4 +1,5 @@
 #include "include/string.h" 
+#include "include/vga/stdio.h"
     void reverse_string(char* string){
         char* string_cpy = 0;
         unsigned int str_len = length(string);
@@ -25,7 +26,7 @@
         return length;
     }    
 
-    int compare_string(volatile const char* string1, volatile const char* string2){
+    unsigned int compare_string(volatile const char* string1, volatile const char* string2){
         unsigned int len1 = length(string1);
         unsigned int len2 = length(string2);
         if (len1 != len2){
@@ -40,5 +41,26 @@
             }
         }
         return 1;
+    }
 
+    unsigned char in_str_arr(char** str, char* target){
+        unsigned int found = 0;
+        for (unsigned int i = 0; *(str + i) != 0; ++i){
+            found = compare_string(*(str + i), target);
+            if (found){
+                break;
+            }
+        }
+        return found;
+    }
+
+    unsigned char search_str_arr(char** str, char* target){
+        int arr_idx = -1;
+        for (unsigned int found;*(str + arr_idx + 1) != 0; ++arr_idx){
+            found = compare_string(*(str + arr_idx + 1), target);
+            if (found){
+                break;
+            }
+        }
+        return arr_idx + 1;
     }
