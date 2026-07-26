@@ -90,7 +90,7 @@ unsigned char prompt(volatile unsigned int *position){
                 else if (Command.com_adr != 0x00){
                     exec(Command.com_adr, Command.arguments);
                 }
-                if (!compare_string(Command.command, "clear") || Command.rcode != 0){
+                if ((!compare_string(Command.command, "clear") || Command.rcode != 0) && Command.com_adr != 0){
                     if (!Command.rcode){
                         printf("\n");
                     }
@@ -143,6 +143,9 @@ struct command parse(char* full_command){
     while (com_idx != length(full_command) && *(full_command + com_idx) != ' ' && com_idx < 63){
         *(command + com_idx) = *(full_command + com_idx);
         ++com_idx;
+    }
+    if (compare_string(command, "")){
+        return Com;
     }
     unsigned int args_idx = 0;
     {
