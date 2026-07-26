@@ -49,7 +49,7 @@ void init_builtin_commands(){
     builtin_commands.needs_args[2]      = 1;
     builtin_commands.arg_count_min[2]   = 1;
     builtin_commands.arg_count_max[2]   = 0;
-    builtin_commands.help[2]            = "fait kaka";
+    builtin_commands.help[2]            = "prints arguments to the screen";
 
 
     builtin_commands.commands[3]        = 0;
@@ -222,7 +222,17 @@ void help(){
     for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
         printf("\n\033\x01%s\033\x0F: %s", *(builtin_commands.commands + i), *(builtin_commands.help + i));
     }
-    printf("\n\033\x06===============================================================================\033\x0F");
+    printf("\n\033\x06================================ [RETURN CODES] ===============================\033\x0F\n");
+    printf("Rcode \033\x03");
+    printf("0\033\x0F: \033\x0EOK\n\033\x0F");
+    printf("Rcode \033\x03");
+    printf("1\033\x0F: \033\4Command does not exist\n\033\x0F");
+    printf("Rcode \033\x03");
+    printf("2\033\x0F: \033\x04Gave argument(s), but command takes no argument\n\033\x0F");
+    printf("Rcode \033\x03");
+    printf("3\033\x0F: \033\4Did not give enough argument to command\n\033\x0F");
+    printf("Rcode \033\x03");
+    printf("4\033\x0F: \033\x04Gave too much arguments to command\033\x0F");
     return;
 }
 
