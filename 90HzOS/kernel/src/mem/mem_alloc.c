@@ -164,7 +164,7 @@ extern struct avail_RAM initRAMstruct;
     }
 
     void free_str(char** str_adr){
-        for (unsigned int i = 0; *(str_adr + i*4) != 0; ++i){
+        for (unsigned int i = 0; *(str_adr + i*4) != 0 && i != 1024; ++i){
             free((unsigned int*)*(str_adr + i*4));
 
             for (unsigned int j = 0; j != 4; ++j){
