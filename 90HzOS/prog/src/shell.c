@@ -158,10 +158,13 @@ struct command parse(char* full_command){
 
         if (!bypass_arg_parse){
             enum boolean allow_spaces = False;
-            char* arg;
+            char arg[64] = {0};
             unsigned int i = 0;
             char* str_target;
-            for (;com_idx != length(full_command) && args_idx >= 63; ++com_idx){
+            for (;com_idx != length(full_command); ++com_idx){
+                if (args_idx >= 63){
+                    break;
+                }
                 if ((*(full_command + com_idx) != ' ' || allow_spaces) && com_idx != length(full_command) && *(full_command + com_idx) != '\"' && *(full_command + com_idx) != '\''){
                     *(arg + i) = *(full_command + com_idx);
                     ++i;
