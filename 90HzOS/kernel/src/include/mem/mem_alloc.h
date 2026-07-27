@@ -10,5 +10,6 @@
     unsigned int* get_next_bloc(unsigned int* bloc);
     void init_bloc(unsigned int* ALLOC_ADR);                // Overrides bloc content w/ only zeros
     char* alloc_str(char* str);
+    void free_str(char** str_adr);
 
 #endif

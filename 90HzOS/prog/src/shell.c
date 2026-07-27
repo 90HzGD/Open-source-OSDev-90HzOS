@@ -5,6 +5,7 @@
 #include "../../kernel/src/include/types.h"
 #include "../../kernel/src/include/vga/stdio.h"
 #include "../../kernel/src/include/mem/mem_alloc.h"
+#include "../../kernel/src/include/types.h"
 
 char argument[2048];
 struct builtinCommands builtin_commands;
@@ -156,7 +157,7 @@ struct command parse(char* full_command){
         *argument = 0;
 
         if (!bypass_arg_parse){
-            char allow_spaces = 0;
+            enum boolean allow_spaces = False;
             char* arg = 0;
             unsigned int i = 0;
             char* str_target;
@@ -165,7 +166,7 @@ struct command parse(char* full_command){
                     *(arg + i) = *(full_command + com_idx);
                     ++i;
                 }
-                else if (*(full_command + com_idx) != '\"' || *(full_command + com_idx) != '\''){
+                else if (*(full_command + com_idx) == '\"' || *(full_command + com_idx) == '\''){
                     allow_spaces = (allow_spaces ^ 1);
                     continue;
                 }
