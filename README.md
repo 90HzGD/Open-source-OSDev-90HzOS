@@ -29,9 +29,9 @@ This project **IS NOT PROFESSIONAL**
     - 90HzOS while shutted down via ^Q(Ctrl + Q)
 
 ## FEATURES
-- This OS features, by now, only really basic **Features**:
+- This OS features, for now, only really basic **Features**:
     - ## **VGA FEATURES**:
-        - The OS is working in **VGA TEXT MODE** 80*25 grid (not that good but idcare for now), so here are **VGA TEXT MODE** function in my OS:
+        - The OS is working in **VGA TEXT MODE** 80*25 grid (for now), so here are **VGA TEXT MODE** function in my OS:
             - **print_string():**      prints a string with a given color and position to the screen thanks to the printchar() func
             - **print_char():**        prints a char to the screen with a given color and position
             - **clear_screen():**      clears the screen
@@ -49,6 +49,8 @@ This project **IS NOT PROFESSIONAL**
             - **replace_string():**     copies the content of a given input to another, ouputs in a given 2nd input
             - **length():**             outputs the length of a given string
             - **compare_string():**     outputs 1 if all elements of two given strings are the same, otherwise: outputs 0
+            - **in_str_arr()**:         input: char** arr, char* str; output: 1 if str found in arr; 0 if not.
+            - **search_str_arr():**     input: char** arr, char* str; output: -1 if str not found in str; if found: index in arr.
     - ## **PS2 KEYBOARD FEATURES**
         - ## **KB DRIVER**
             - Some Low level keyboard driver functions:
@@ -75,13 +77,15 @@ This project **IS NOT PROFESSIONAL**
           - **get_previous_bloc():**       Util used by free(), Outputs the data pointer of the previous bloc in the **HEAP** _(with a bloc data pointer as input)_
           - **get_next_bloc():**           Util used by free(), Outputs the bloc data pointer of the bloc next, to the _given bloc data pointer_ as input
           - **init_bloc():**               Overrides the content of a given bloc data pointer, full of zeros
+          - **alloc_str():**               Allocates strings in **heap**: input: char* str; output: 0 if error; allocation adr if not.
+          - **free_str():**                Free all strings in a _char**_ array in the heap.
     - ## **OTHER FUNCTIONS**:
         - **init_RAM():** describes in a struct, where the OS can write into RAM in several segments, associated with the length for each segment _(kernel.c func btw)_
 
 - ## **WHAT DOES THE COMPILED OS**:
-    - First the bootloader loads up at _0x7C00_ and loads **20 sectors** _(kernel entry + kernel)_ at 0x10000, which is moved to 0x100000 when switched to **32bit protected mode.**, it also get info about _Usable RAM segments at 0x8000_
-    - Then, it jumps at **0x100000** and execute the kernel entry point, who calls the **main func** in _kernel.c_, the kernel initialize the **struct for usable memory segments**, and _initializes keyboard_.
-    - Once all these steps done, it prints a welcome message and execute a hardcoded entry point for a program, here, its a _pseudo-terminal_ where the **only working command** is: "_clear_".
+    - First the bootloader loads up at _0x7C00_ and loads the stage 2 of bootloader _(at LBA 2048)_ at 0x5500. Then, the stage 2 fetches E820 RAM info, loads the kernel entry at 0x10000 _(LBA 2050)_ , loads the GDT moves the kernel from 0x10000 to 0x100000 and jump to 0x100000 at the kernel entry _(90HzOS/kernel/src/entry.asm)_.
+    - Then it calls the **main func** in _kernel.c_, the kernel initializes the **struct for usable memory segments**, and _initializes keyboard_.
+    - Once all these steps done, the kernel executes a hardcoded entry point, here its a **shell** with a working **command parser** _(which supports "" btw)_. Avail. commands: _clear; help; echo_.
     - Once the terminal stopped, the main function returns and back to the **entry point file** _(entry.asm)_ it **halts the CPU until you shutdown the PC yourself**.
 
 ## How To compile
@@ -139,15 +143,23 @@ This project **IS NOT PROFESSIONAL**
         - Then add the PATH to your cross compilers directory at the end
         - Then apply changes and _reboot your computer_
 - 6. **END**
-    - If you did the previous steps correctly (sorry if didn't work) you can do: ``cd ~/OSDev`` then execute: ``make all``
+    - If you did the previous steps correctly (sorry if didn't work) you can do: ``cd ~/OSDev`` then execute: ``make compile``
     - If you are on Windows, try to adapt the code of the Makefile!
     
 ## HOW TO RUN ON QEMU
 - **RUN THIS COMMAND**:
     - ``qemu-system-x86_64 -monitor stdio -hda ~/OSDev/90HzOS/OS/90HzOS.bin``
 ## HOW TO RUN ON VIRTUALBOX:
-- **FLOPPY DISK USAGE**
-    - Create a new virtual machine and set img/disk.img as floppy disk drive
+- **HARD DRIVE**
+    - Create a new virtual machine, convert the raw image to a Virtualbox hard drive image, and set it as the IDE of the VM
+## HOW TO RUN ON 86Box:
+- Set up a new virtual machine until setting up a hard drive, just click on **add existing** then **browse** and add the raw image at: _90HzOS/OS/90HzOS.bin_
+## HOW TO RUN ON REAL HARDWARE (NO UEFI SUPPORT!!):
+- First, recompile the Operating system by doing `make compile` in _~/OSDev_.
+- Connect a bootable medium to your computer.
+- Get device by doing `lsblk` in your terminal _(for example: /dev/sdb)_
+- execute ./bash/writedisk.sh and type the device name then enter **DO NOT TYPE DEVICE WHERE YOUR RUNNING OPERATING SYSTEM IS!!**
+- On Legacy boot BIOS computer boot on that medium
      
      
      
