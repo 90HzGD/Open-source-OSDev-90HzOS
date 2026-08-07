@@ -262,7 +262,7 @@ char** echo(char** arguments){
     return ret;
 }
 
-char* avail_args[11];
+char* avail_args[256];
 
 char** uname(char** arguments){
     avail_args[0] = "-s";
@@ -275,7 +275,9 @@ char** uname(char** arguments){
     avail_args[7] = "--machine";
     avail_args[8] = "-o";
     avail_args[9] = "--operating-system";
-    avail_args[10] = 0;
+    avail_args[10] = "-a";
+    avail_args[11] = "--all";
+    avail_args[12] = 0;
     *ret = (char*)OK;
     *(ret+1) = (char*)0;
     
@@ -307,6 +309,9 @@ char** uname(char** arguments){
     }
     else if (compare_string(*(arguments), *(avail_args + 8)) || compare_string(*arguments, *(avail_args + 9))){
         printf("%s", OS_NAME);
+    }
+    else if (compare_string(*(arguments), *(avail_args + 10)) || compare_string(*arguments, *(avail_args + 11))){
+        printf("%s Ver: %s %s 32bit i386+ protected mode", KRNL_NAME, KRNL_VER, KRNL_ARCHITECTURE);
     }
     else {
         printf("%s", KRNL_NAME);
