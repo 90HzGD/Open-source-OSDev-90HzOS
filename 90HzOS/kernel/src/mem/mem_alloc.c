@@ -53,10 +53,8 @@ extern struct avail_RAM initRAMstruct;
             return;
         }
         enum boolean last = *(ALLOC_ADR + ((*(ALLOC_ADR - 1))/4)) == 2;
-        extern void freeze();
         unsigned int* prev_adr;
         unsigned int* size_ptr;
-        extern void freeze();
         if (last){
             prev_adr = get_previous_bloc(ALLOC_ADR);
             if (*(prev_adr - 2) == 0){
@@ -123,12 +121,17 @@ extern struct avail_RAM initRAMstruct;
     unsigned int* get_previous_bloc(unsigned int* bloc){
         unsigned int* current_adr = initRAMstruct.heap_begin;
         unsigned int* old_adr = current_adr;
+        int i = 0;         // Temp for no loop
         do {
+            ++i;
             old_adr = current_adr;
             ++current_adr;
             current_adr += *(current_adr)/4;
             ++current_adr;
-        } while (current_adr != bloc - 2);
+        } while (current_adr != bloc - 2 && i < 0);
+        if (i <= 0){
+            printf("\n\033\4Freeing Memory chunk may did not finish correctly,\nyou may have memory corruption at this chunk location.\033\x0F");
+        }
         current_adr = old_adr+2;
         return current_adr;
     }
@@ -164,12 +167,9 @@ extern struct avail_RAM initRAMstruct;
     }
 
     void free_str(char** str_adr){
-        for (unsigned int i = 0; *(str_adr + i*4) != 0 && i != 1024; ++i){
-            free((unsigned int*)*(str_adr + i*4));
-
-            for (unsigned int j = 0; j != 4; ++j){
-                *(str_adr + i*4 + j) = 0;
-            }
+        for (unsigned int i = 0; *(str_adr + i) != 0 && i != 1024; ++i){
+            free((unsigned int*)*(str_adr + i));
+            *(str_adr + i) = 0;
         }
         return;
     }

@@ -33,14 +33,14 @@ void next_entry(int clear){
 void init_builtin_commands(){
     builtin_commands.commands[0]        = "clear";
     builtin_commands.builtin_adr[0]     = (unsigned int*)&clear;
-    builtin_commands.needs_args[0]      = 0;
+    builtin_commands.needs_args[0]      = -1;
     builtin_commands.arg_count_min[0]   = 0;
     builtin_commands.arg_count_max[0]   = 0;
     builtin_commands.help[0]            = "Clears shell's screen";
 
     builtin_commands.commands[1]        = "help";
     builtin_commands.builtin_adr[1]     = (unsigned int*)&help;
-    builtin_commands.needs_args[1]      = 0;
+    builtin_commands.needs_args[1]      = -1;
     builtin_commands.arg_count_min[1]   = 0;
     builtin_commands.arg_count_max[1]   = 0;
     builtin_commands.help[1]            = "Prints This help screen";
@@ -52,12 +52,19 @@ void init_builtin_commands(){
     builtin_commands.arg_count_max[2]   = 0;
     builtin_commands.help[2]            = "prints arguments to the screen";
 
+    builtin_commands.commands[3]        = "uname";
+    builtin_commands.builtin_adr[3]     = (unsigned int*)&uname;
+    builtin_commands.needs_args[3]      = 0;
+    builtin_commands.arg_count_min[3]   = 0;
+    builtin_commands.arg_count_max[3]   = 1;
+    builtin_commands.help[3]            = "prints OS info";
 
-    builtin_commands.commands[3]        = 0;
+    builtin_commands.commands[4]        = 0;
     return;
 }
 
 char* command_args[256];
+struct command Command;
 
 unsigned char prompt(volatile unsigned int *position){
     printf("\n[90HzOS@krnl]$ \033\xF0%c\033\x0F", 0);
@@ -84,7 +91,7 @@ unsigned char prompt(volatile unsigned int *position){
                 }
                 --*(position);
                 printf("\033\x00  \033\x0F");
-                struct command Command = parse(full_command);
+                Command = parse(full_command);
                 if (Command.rcode != 0){
                     com_err(Command);
                 }
@@ -205,7 +212,7 @@ struct command parse(char* full_command){
         Com.com_adr = *(builtin_commands.builtin_adr + idx);
     }
     if (idx >= 0){
-        if (!*(builtin_commands.needs_args + idx) && args_idx > 0){
+        if (*(builtin_commands.needs_args + idx) < 0 && args_idx > 0){
             Com.rcode = Takes_No_Arg;
         }
         else if (*(builtin_commands.needs_args + idx) && *(builtin_commands.arg_count_min + idx) > args_idx){
@@ -217,14 +224,20 @@ struct command parse(char* full_command){
     }
     
     return Com;
-}  
-
-void clear(){
-    clear_screen();
-    return;
 }
 
-void help(){
+char* ret[4];
+
+char** clear(){
+    *ret = (char*)OK;
+    *(ret+1) = (char*)0;
+    clear_screen();
+    return ret;
+}
+
+char** help(){
+    *ret = (char*)OK;
+    *(ret+1) = (char*)0;
     printf("\n\033\x06============================== [BUILTIN COMMANDS] =============================");
     for (unsigned int i = 0; *(builtin_commands.commands + i) != 0; ++i){
         printf("\n\033\x01%s\033\x0F: %s", *(builtin_commands.commands + i), *(builtin_commands.help + i));
@@ -240,15 +253,70 @@ void help(){
     printf("3\033\x0F: \033\4Did not give enough argument to command\n\033\x0F");
     printf("Rcode \033\x03");
     printf("4\033\x0F: \033\x04Gave too much arguments to command\033\x0F");
-    return;
+    return ret;
 }
 
-void echo(char** arguments){
+char** echo(char** arguments){
+    *ret = (char*)OK;
+    *(ret+1) = (char*)0;
     printf("\n");
     for (unsigned int i = 0; *(arguments + i) != 0; ++i){
         printf("%s", *(arguments + i));
     }
-    return;
+    return ret;
+}
+
+char* avail_args[11];
+
+char** uname(char** arguments){
+    extern void freeze();
+    avail_args[0] = "-s";
+    avail_args[1] = "--kernel-name";
+    avail_args[2] = "-r";
+    avail_args[3] = "--kernel-release";
+    avail_args[4] = "-v";
+    avail_args[5] = "--kernel-version";
+    avail_args[6] = "-m";
+    avail_args[7] = "--machine";
+    avail_args[8] = "-o";
+    avail_args[9] = "--operating-system";
+    avail_args[10] = 0;
+    *ret = (char*)OK;
+    *(ret+1) = (char*)0;
+    
+
+    if (*arguments != 0){
+        for (unsigned int i = 0; *(arguments + i) != 0; ++i){
+            if (!in_str_arr(avail_args, *(arguments + i))){
+                *ret = (char*)Unknown_Arg;
+                *(ret + 1) = "uname";
+                *(ret + 2) = *((arguments + i));
+                *(ret + 3) = 0;
+                return ret;
+            }
+        }
+    }
+    printf("\n");
+
+    if (compare_string(*arguments, *(avail_args)) || compare_string(*arguments, *(avail_args + 1))){
+        printf("%s", KRNL_NAME);
+    }
+    else if (compare_string(*(arguments), *(avail_args + 2)) || compare_string(*arguments, *(avail_args + 3))){
+        printf("%s", KRNL_RELEASE);
+    }
+    else if (compare_string(*(arguments), *(avail_args + 4)) || compare_string(*arguments, *(avail_args + 5))){
+        printf("Kernel Ver: %s", KRNL_VER);
+    }
+    else if (compare_string(*(arguments), *(avail_args + 6)) || compare_string(*arguments, *(avail_args + 7))){
+        printf("%s 32bit protected mode (i386+)", KRNL_ARCHITECTURE);
+    }
+    else if (compare_string(*(arguments), *(avail_args + 8)) || compare_string(*arguments, *(avail_args + 9))){
+        printf("%s", OS_NAME);
+    }
+    else {
+        printf("%s", KRNL_NAME);
+    }
+    return ret;
 }
 
 void com_err(struct command Com){
@@ -265,6 +333,19 @@ void com_err(struct command Com){
             break;
         case Too_Many_Arg:
             printf("%s: \033\x04Too many arguments were given.\033\x0F\n", Com.command);
+            break;
+        default:
+            break;
+    }
+    return;
+}
+
+void exec_err(char** err){
+    printf("\n\033\x07[\033\4FAIL\033\x07]\033\x0F ");
+    switch ((enum commands_rcode)*err){
+        case Unknown_Arg:
+            printf("\033\x04%s\033\x0F: Unknown Argument: \033\x04%s\033\x0F\n", *(err + 1), *(err + 2));
+            Command.rcode = 5;
             break;
         default:
             break;

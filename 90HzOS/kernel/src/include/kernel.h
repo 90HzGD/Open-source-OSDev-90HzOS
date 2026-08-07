@@ -12,6 +12,13 @@
         #define BASE_PTR_INITRAM        0x4004
         #define LENGTH_INITRAM          0x5004
 
+        #define KRNL_NAME "90HzOS Custom Kernel"
+        #define KRNL_RELEASE "90HzOS Kernel [UNDER CONSTRUCTION]"
+        #define KRNL_VER "0 UNDER CONTRUCTION"
+        #define KRNL_ARCHITECTURE "x86"
+        #define OS_NAME "90HzOS"
+        #define KRNL_BITS 32
+
         struct avail_RAM {
             unsigned int* baseptr[64];
             unsigned int  length[64];
