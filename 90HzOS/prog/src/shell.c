@@ -92,7 +92,7 @@ unsigned char prompt(volatile unsigned int *position){
                 else if (Command.com_adr != 0x00){
                     exec(Command.com_adr, Command.arguments);
                 }
-                if ((!compare_string(Command.command, "clear") || Command.rcode != 0) && Command.com_adr != 0){
+                if ((!compare_string(Command.command, "clear") || Command.rcode != 0) && (Command.com_adr != 0 || Command.rcode != 0)){
                     if (!Command.rcode){
                         printf("\n");
                     }

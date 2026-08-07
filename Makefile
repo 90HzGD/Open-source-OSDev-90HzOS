@@ -1,4 +1,4 @@
-CFLAGS= -Wall -Wextra -Iinclude
+cCFLAGS= -Wall -Wextra -Iinclude
 
 compile:
 	clear
@@ -44,3 +44,7 @@ clear:
 	mkdir -p ~/OSDev/90HzOS/kernel/src ~/OSDev/90HzOS/kernel/bin ~/OSDev/90HzOS/OS ~/OSDev/90HzOS/img ~/OSDev/90HzOS/boot/bin ~/OSDev/90HzOS/boot/src ~/OSDev/90HzOS/kernel/bin/full ~/OSDev/90HzOS/kernel/bin/build ~/OSDev/90HzOS/prog/bin/build/ ~/OSDev/90HzOS/kernel/bin/build/vga ~/OSDev/90HzOS/kernel/bin/build/mem/
 	rm -rf ./90HzOS/boot/bin ./90HzOS/kernel/bin ./90HzOS/prog/bin ./90HzOS/img/* ./90HzOS/OS/* ./90HzOS/vdi
 	mkdir -p ~/OSDev/90HzOS/kernel/bin ~/OSDev/90HzOS/OS ~/OSDev/90HzOS/img ~/OSDev/90HzOS/boot/bin  ~/OSDev/90HzOS/kernel/bin/full ~/OSDev/90HzOS/kernel/bin/build ~/OSDev/90HzOS/prog/bin/build/ ~/OSDev/90HzOS/vdi/temp ~/OSDev/90HzOS/kernel/bin/build/vga ~/OSDev/90HzOS/kernel/bin/build/mem
+
+open_all_vscode:
+	code ~/OSDev/90HzOS/boot/src/* ~/OSDev/90HzOS/kernel/src/kernel.c ~/OSDev/90HzOS/kernel/src/entry.asm ~/OSDev/90HzOS/kernel/src/string.c ~/OSDev/90HzOS/kernel/src/vga/* ~/OSDev/90HzOS/kernel/src/drivers/keyboard/api* ~/OSDev/90HzOS/kernel/src/drivers/keyboard/ps2.c ~/OSDev/90HzOS/kernel/src/mem/* ~/OSDev/90HzOS/kernel/src/drivers/ports/* ~/OSDev/90HzOS/kernel/src/include/*.h ~/OSDev/90HzOS/kernel/src/include/drivers/ports/* ~/OSDev/90HzOS/kernel/src/include/drivers/keyboard/* ~/OSDev/90HzOS/kernel/src/include/mem/* ~/OSDev/90HzOS/kernel/src/include/vga/*
+	code ~/OSDev/90HzOS/prog/src/include/* ~/OSDev/90HzOS/prog/src/shell.c ~/OSDev/90HzOS/prog/src/shellUtil.asm
