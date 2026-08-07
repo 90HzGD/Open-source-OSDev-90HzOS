@@ -1,4 +1,5 @@
 ## Open Source OSDev Project made by a random French guy
+90HzOS will be a future x86 i386+ operating system based on my Custom kernel in this repo.
 This is the begining of my project _90HzOS_. (Sorry for bad english) 
 Which even runs on REAL COMPUTER
 This project **IS NOT PROFESSIONAL**
