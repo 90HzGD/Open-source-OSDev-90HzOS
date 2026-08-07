@@ -14,15 +14,9 @@ void next_entry(int clear){
     init_builtin_commands();
 
     init_keys();
-    if (clear >= 1){
+    if (clear){
         clear_screen();
     }
-    print_string("--------------------------------------------------------------------------------", 0x0F, &position);
-    unsigned char centerX = (80-length("Executed Built-in shell"))/2;
-    for (unsigned int i = 0; i != centerX; ++i){
-        print_char(' ', 0x00, &position);
-    }
-    printf("\033\16Executed Built-in shell\n\033\x0F");
     unsigned char ret = 0;
     while (!ret){
         ret = prompt(&position);
@@ -67,7 +61,7 @@ char* command_args[256];
 struct command Command;
 
 unsigned char prompt(volatile unsigned int *position){
-    printf("\n[90HzOS@krnl]$ \033\xF0%c\033\x0F", 0);
+    printf("\n[90HzOS@krnl] >\033\xF0%c\033\x0F", 0);
     --*(position);
     struct output trans_key;
     unsigned char key=0;
@@ -252,7 +246,9 @@ char** help(){
     printf("Rcode \033\x03");
     printf("3\033\x0F: \033\4Did not give enough argument to command\n\033\x0F");
     printf("Rcode \033\x03");
-    printf("4\033\x0F: \033\x04Gave too much arguments to command\033\x0F");
+    printf("4\033\x0F: \033\x04Gave too much arguments to command\n\033\x0F");
+    printf("Rcode \033\x03");
+    printf("5\033\x0F: \033\x04Invalid / Non-existing Argument\033\x0F");
     return ret;
 }
 
@@ -269,7 +265,6 @@ char** echo(char** arguments){
 char* avail_args[11];
 
 char** uname(char** arguments){
-    extern void freeze();
     avail_args[0] = "-s";
     avail_args[1] = "--kernel-name";
     avail_args[2] = "-r";

@@ -18,7 +18,7 @@ enum Return_codes_main main(){
 
     clear_screen();
 
-    char string[] = "Booted into kernel entry at 0x100000!\n\t   In main C func in kernel:";
+    char string[] = "In main C func in kernel:";
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s\033\x06 %p\033\x00\n", string, main_pointer);
 
     init_RAM();
@@ -47,8 +47,6 @@ enum Return_codes_main main(){
     replace_string(string, "Initialized keyboard.\n");
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s", string);
     extern volatile unsigned int position;
-    char* CPU_name = Get_CPU_name();
-    printf("CPU: %s\n", CPU_name);
 
     print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x01, &position);
 
@@ -80,10 +78,8 @@ unsigned char handle_kb(){
 }
 
 enum Return_codes_main init_RAM(){
-    extern void freeze();
     enum Return_codes_main initRAMrcode = _OK;
-    printf("\033\x0CInitRAM Begin:\033\x0F\n");
-    printf("Setting Usable RAM Segments:\n");
+    printf("\033\x0FSetting Usable RAM Segments:\n");
 
     // Set avail_RAM struct
     unsigned int*  baseptr      =  (unsigned int*)  BASE_PTR_INITRAM;
@@ -122,8 +118,6 @@ enum Return_codes_main init_RAM(){
     initRAMstruct.total_RAM     = total_len - kernel_end;
     printf("Set Kernel Heap to: \033\x06%p\033\x0F\n", initRAMstruct.heap_begin);
     init_heap(total_len);
-
-    printf("\033\x0CInitRAM end.\033\x0F\n");
 
     return initRAMrcode;
 }
