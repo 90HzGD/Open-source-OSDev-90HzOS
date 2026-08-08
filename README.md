@@ -1,12 +1,13 @@
 ## Open Source OSDev Project made by a random French guy
 90HzOS will be a future x86 i386+ operating system based on my Custom kernel in this repo.
-This is the begining of my project _90HzOS_. (Sorry for bad english) 
-Which even runs on REAL COMPUTER
+This is the beginning of my project _90HzOS_. (Sorry for bad english) 
+It even runs on REAL COMPUTER
 This project **IS NOT PROFESSIONAL**
 
 ## GO TO
 **Click Where you want to go!**
 - [Here](#go-to)
+    - [Project Progression](#project-progression)
     - [OS Screenshots](#os-screenshots)
     - [OS Features](#features)
         - [VGA Features](#vga-features)
@@ -20,6 +21,31 @@ This project **IS NOT PROFESSIONAL**
     - [Compiling Tutorial (May need adaptations in Makefile)](#how-to-compile)
     - [How to run on QEMU](#how-to-run-on-qemu)
     - [How to run on VirtualBox](#how-to-run-on-virtualbox)
+ 
+## Project Progression:
+- **DONE:**
+    - `[x] Valid Boot sector`
+    - `[x] Custom OS loader: stage1 & stage2`
+    - `[x] Global Descriptor Table`
+    - `[x] Switch to Protected mode (32bit)`
+    - `[x] Kernel Load`
+    - `[x] Kernel Jump (main func())`
+    - `[x] VGA Text lib (printf()...)`
+    - `[x] E820 RAM Detection`
+    - `[x] PS/2 Keyboard Driver`
+    - `[x] PS/2 Keyboard API`
+    - `[x] Memory Allocation Lib`
+    - `[x] Shell execution`
+    - `[x] Shell command parser`
+    - `[x] Shell command executor`
+    - `[x] Runs on 3 emulators: QEMU;86Box;VirtualBox`
+    - `[x] Runs on real hardware!`
+- **Planned:**
+    - `[ ] Read / Write ATA Driver`
+    - `[ ] Custom Filesystem`
+    - `[ ] VESA BIOS Graphics mode (+custom font)`
+    - `[ ] Custom image format`
+    - `[ ] Read / Write AHCI Driver`
 
 ## OS Pictures
 - ![OS Running on real hardware](pictures/realPC.png)
@@ -27,7 +53,7 @@ This project **IS NOT PROFESSIONAL**
 - ![OS Running](pictures/90HzOS.png)
     - 90HzOS while running
 - ![OS shutted down](pictures/shutdown.png)
-    - 90HzOS while shutted down via ^Q(Ctrl + Q)
+    - 90HzOS while shut down via ^Q(Ctrl + Q)
 
 ## FEATURES
 - This OS features, for now, only really basic **Features**:
@@ -36,18 +62,18 @@ This project **IS NOT PROFESSIONAL**
             - **print_string():**      prints a string with a given color and position to the screen thanks to the printchar() func
             - **print_char():**        prints a char to the screen with a given color and position
             - **clear_screen():**      clears the screen
-            - **setBG():**             changes the background color with a given color
+            - **setBG():**             changes screen's background color with a given color
             - **change_color():**      changes the color of the background of a given single position (& given color)
             - **move_grid():**         moves the **VGA TEXT MODE** grid.
             - **And the longest one: printf() which is divided in other functions:**
                 - **printf():**             prints integers, unsigned integers, pointers, chars and strings inside of a given string with the sign: '%' in it, thanks to other functions
                 - **print_integer():**      prints an integer to screen
                 - **print_uinteger():**     prints an unsigned int to the screen
-                - **print_hex():**          prints a hexadecimal RAM adress
+                - **print_hex():**          prints a hexadecimal RAM address
     - ## **STRING FEATURES**:
         - Some basic **strings functions**:
             - **reverse_string():**     reverses the bytes position in string _(if input = {'a', 'b', 'c'}, then output = {'c', 'b', 'a'}_.
-            - **replace_string():**     copies the content of a given input to another, ouputs in a given 2nd input
+            - **replace_string():**     copies the content of a given input to another, outputs in a given 2nd input
             - **length():**             outputs the length of a given string
             - **compare_string():**     outputs 1 if all elements of two given strings are the same, otherwise: outputs 0
             - **in_str_arr()**:         input: char** arr, char* str; output: 1 if str found in arr; 0 if not.
@@ -59,35 +85,40 @@ This project **IS NOT PROFESSIONAL**
                 - **load_idt():**             loads the idt with lidt instruction
                 - **kbinit():**               outbyte at 0x21: 0b11111101 (activates only keyboard)
                 - **enable_int():**           enables CPU interrupts (only keyboard for now)
-                - **keyboard_handler():**     set in idt, manages each input on the keyboard (such as pressed / released, toogles Shift on or off, same for Ctrl and Alt btw)
+                - **keyboard_handler():**     set in idt, manages each input on the keyboard (such as pressed / released, toggles Shift on or off, same for Ctrl and Alt btw)
                 - **handle_keyboard():**      in kernel.c, manages the output of the keyboard, if 0x64 returns 1, the kernel talks to 0x60 to get the scancode, manages extended keys too.
         - ## **KEYBOARD DRIVER API**
             - Some functions to easily access to the keyboard activity via this **API**:
-                - **get_key():**           outputs scancode _(does not wait for you to press smt, returns 0 if None keys are pressed)_
+                - **get_key():**           returns the latest keyboard scancode without blocking. _(Returns 0 if no key event is available.)_
                 - **init_keys():**         initializes the API array's
-                - **transkey():**          takes a scancode as input and returns a struct of almost everything _(can manage Ctrl keybinds up to 6 appended inputs)_ _(Shift ON/OFF; Ctrl ON/OFF; Alt ON/OFF; ifchar; released; keypressed)_
+                - **transkey():**          converts a raw scancode into a keyboard event structure containing the key state, modifier states, character representation, and release state.
                 - **Shitkey():**           Used by transkey, returns the input as shifted on the keyboard _(examples: q -> Q; 1 -> !...)_ _(Shift ON/OFF formula: Shift Pressed XOR CapsLock)_
-                - **extended_char():**     Also used by transkey, returns input if the key toogled is extended
+                - **extended_char():**     Also used by transkey, returns input if the key toggled is extended
   - ## **MEMORY FEATURES**
       - **Basic Memory allocation functions():**
           - **init_heap():**               Initializes the heap when booting
-          - **malloc():**                  Allocates RAM with a given size in _bytes_ to a data, gives it an assigned bloc in the **HEAP**
-          - **free():**                    Marks bloc generated by _malloc()_ in **HEAP** as free, **adds the blocs** next to this bloc if there are _unused_
-          - **write_string():**            Writes a _string_ into a bloc data in the **HEAP**
-          - **get_remain_heap_RAM():**     _(mode=0)_: Outputs remaining RAM after **last bloc in HEAP** | _(mode=1)_ Outputs remaining available size in the **HEAP** _(counts unused bloc)_
-          - **get_previous_bloc():**       Util used by free(), Outputs the data pointer of the previous bloc in the **HEAP** _(with a bloc data pointer as input)_
-          - **get_next_bloc():**           Util used by free(), Outputs the bloc data pointer of the bloc next, to the _given bloc data pointer_ as input
-          - **init_bloc():**               Overrides the content of a given bloc data pointer, full of zeros
+          - **malloc():**                  Allocates RAM with a given size in _bytes_ to a data, gives it an assigned block in the **HEAP**
+          - **free():**                    Marks block generated by _malloc()_ in **HEAP** as free, **adds the blocks** next to this block if there are _unused_
+          - **write_string():**            Writes a _string_ into a block data in the **HEAP**
+          - **get_remain_heap_RAM():**     _(mode=0)_: Outputs remaining RAM after **last block in HEAP** | _(mode=1)_ Outputs remaining available size in the **HEAP** _(counts unused block)_
+          - **get_previous_bloc():**       Util used by free(), Outputs the data pointer of the previous block in the **HEAP** _(with a block data pointer as input)_
+          - **get_next_bloc():**           Util used by free(), Outputs the block data pointer of the block next, to the _given block data pointer_ as input
+          - **init_bloc():**               Overrides the content of a given block data pointer, full of zeros
           - **alloc_str():**               Allocates strings in **heap**: input: char* str; output: 0 if error; allocation adr if not.
           - **free_str():**                Free all strings in a _char**_ array in the heap.
     - ## **OTHER FUNCTIONS**:
-        - **init_RAM():** describes in a struct, where the OS can write into RAM in several segments, associated with the length for each segment _(kernel.c func btw)_
+        - **init_RAM():** describes in a struct, where the OS can write to RAM in several segments, associated with the length for each segment _(kernel.c func btw)_
 
-- ## **WHAT DOES THE COMPILED OS**:
-    - First the bootloader loads up at _0x7C00_ and loads the stage 2 of bootloader _(at LBA 2048)_ at 0x5500. Then, the stage 2 fetches E820 RAM info, loads the kernel entry at 0x10000 _(LBA 2050)_ , loads the GDT moves the kernel from 0x10000 to 0x100000 and jump to 0x100000 at the kernel entry _(90HzOS/kernel/src/entry.asm)_.
-    - Then it calls the **main func** in _kernel.c_, the kernel initializes the **struct for usable memory segments**, and _initializes keyboard_.
-    - Once all these steps done, the kernel executes a hardcoded entry point, here its a **shell** with a working **command parser** _(which supports "" btw)_. Avail. commands: _clear; help; echo_.
-    - Once the terminal stopped, the main function returns and back to the **entry point file** _(entry.asm)_ it **halts the CPU until you shutdown the PC yourself**.
+- ## **BOOT PROCESS**:
+    - 1. The bootloader is loaded at `0x7C00`.
+    - 2. It loads stage 2 from LBA 2048 to `0x5500`.
+    - 3. Stage 2 retrieves the available RAM regions using BIOS E820.
+    - 4. The kernel entry is loaded from LBA 2050 to `0x10000`.
+    - 5. The GDT is loaded and the CPU switches to 32-bit protected mode.
+    - 6. The kernel is moved from `0x10000` to `0x100000`.
+    - 7. Execution jumps to the kernel entry point at `0x100000`.
+    - 8. The kernel initializes memory and the keyboard.
+    - 9. The shell starts.
 
 ## How To compile
 **PLZ NOTE THAT SOME COMMANDS WONT WORK ON WINDOWS, SO I RECOMMEND USING A UNIX/GNULinux SYSTEM**
@@ -98,7 +129,7 @@ This project **IS NOT PROFESSIONAL**
     - ``sudo pacman -S nasm qemu-common``
 - **On Ubuntu or any Debian based Linux Distro**
     - ``sudo apt update && sudo apt full-upgrade -y``
-    - ``sudo apt intall nasm qemu-common``
+    - ``sudo apt install nasm qemu-common``
 - **On Windows**
 - Download the following files (you can also use curl with the link in PS):
   - ``https://www.nasm.us/pub/nasm/releasebuilds/3.02rc7/win64/nasm-3.02rc7-installer-x64.exe``
@@ -114,7 +145,7 @@ This project **IS NOT PROFESSIONAL**
          - ``tar xfv binutils-with-gold-2.46.tar.xz``
          - ``mkdir binutils-build``
          - ``cd binutils-build``
-         - ``../binutils-with-gold-2.46.tar.xz/configure --target=i386-elf --enable-multilib --disable-nls --disable-werror --prefix=/usr/var/i386elfgcc 2>&1 | tee configure.log``
+         - ``../binutils-with-gold-2.46/configure --target=i386-elf --enable-multilib --disable-nls --disable-werror --prefix=/usr/var/i386elfgcc 2>&1 | tee configure.log``
          - ``sudo make all install 2>&1 | tee make.log``
     - Install gcc cross compiler:
          - ``cd /tmp/src``
@@ -122,17 +153,17 @@ This project **IS NOT PROFESSIONAL**
          - ``tar xfv gcc-15.2.0.tar.xz``
          - ``mkdir gcc-build``
          - ``cd gcc-build``
-         - ``../gcc-15.2.0/configure --target=i386-elf --prefix=/usr/var/i386elfgcc --disable-nls --disable-libssp --enable-language=c++ --without-headers``
+         - ``../gcc-15.2.0/configure --target=i386-elf --prefix=/usr/var/i386elfgcc --disable-nls --disable-libssp --enable-language=c --without-headers``
          - ``sudo make all-gcc -j$(nproc)``
          - ``sudo make all-target-libgcc -j$(nproc)``
          - ``sudo make install-gcc -j$(nproc)``
-         - ``sudo make install-taget-libgcc -j$(nproc)``
+         - ``sudo make install-target-libgcc -j$(nproc)``
 - 5. Add cross compilers to the **PATH**:
     - On **UNIX/GNULinux**:
         - **TEMP**:
-            - To add the compilers to the PATH **temporarily** *(disapeare after closing bash session)*:
+            - To add the compilers to the PATH **temporarily** *(disappear after closing bash session)*:
                 - ``export PATH="/usr/var/i386elfgcc:$PATH"``
-            - To add it **permanantly**, you can edit your ~/.bashrc file:
+            - To add it **permanently**, you can edit your ~/.bashrc file:
                 - ``nano ~/.bashrc``
                 - Add this line at the end if file:
                     - ``export PATH="/usr/var/i386elfgcc:$PATH"``
