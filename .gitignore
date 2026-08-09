@@ -17,4 +17,5 @@ var/
 sdb
 
 *.log
+*.txt
 layout.map

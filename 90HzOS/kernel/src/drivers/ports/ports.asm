@@ -23,6 +23,10 @@ extern handle_kb
 
 global inb
 global outb
+global inw
+global outw
+global inl
+global outl
 global load_idt
 global enable_int
 global kb_handler
@@ -113,13 +117,38 @@ alt_released:
 
 inb:
     mov edx, [esp+4]        ; C Arg#1 == unsigned short port
-    in eax, dx              ; Set in byte eax with port dx | eax = C ret value
+    mov eax, 0
+    in al, dx              ; Set in byte eax with port dx | eax = C ret value
+    ret
+
+inw:
+    mov edx, [esp + 4]
+    mov eax, 0
+    in ax, dx
+    ret
+
+inl:
+    mov edx, [esp + 4]
+    mov eax, 0
+    in eax, dx
     ret
 
 outb:
-    mov edx, [esp+4]        ; == unsigned short port
-    mov eax, [esp+8]        ; == unsigned char value
-    out dx, al              ; Set al value in out port
+    mov edx, [esp+4]
+    movzx eax, byte [esp+8]        
+    out dx, al              
+    ret
+    
+outw:
+    mov edx, [esp+4]
+    movzx eax, word [esp+8]        
+    out dx, ax              
+    ret
+    
+outl:
+    mov edx, [esp+4]
+    mov ax, [esp+8]        
+    out dx, eax              
     ret
 
 ; Stack:

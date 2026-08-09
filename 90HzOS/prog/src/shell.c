@@ -6,6 +6,7 @@
 #include "../../kernel/src/include/vga/stdio.h"
 #include "../../kernel/src/include/mem/mem_alloc.h"
 #include "../../kernel/src/include/types.h"
+#include "../../kernel/src/include/drivers/PCI/PCI.h"
 
 char argument[2048];
 struct builtinCommands builtin_commands;
@@ -53,7 +54,14 @@ void init_builtin_commands(){
     builtin_commands.arg_count_max[3]   = 1;
     builtin_commands.help[3]            = "prints OS info";
 
-    builtin_commands.commands[4]        = 0;
+    builtin_commands.commands[4]        = "lspci";
+    builtin_commands.builtin_adr[4]     = (unsigned int*)&lspci;
+    builtin_commands.needs_args[4]      = 0;
+    builtin_commands.arg_count_min[4]   = 0;
+    builtin_commands.arg_count_max[4]   = 1;
+    builtin_commands.help[4]            = "Displays connected PCI devices";
+
+    builtin_commands.commands[5]        = 0;
     return;
 }
 
@@ -315,6 +323,41 @@ char** uname(char** arguments){
     }
     else {
         printf("%s", KRNL_NAME);
+    }
+    return ret;
+}
+
+
+char** lspci(){
+    struct PCIVendors Vendors;
+    fillVendors(Vendors.Vendors_str, (unsigned short*)&Vendors.VendorsID);
+    *ret = (char*)OK;
+    *(ret+1) = (char*)0;
+    struct PCIDev_Descriptor Device;
+    printf("\nEnumerating PCI devices:\n");
+    for (unsigned short i = 0; i != BUS_COUNT; ++i){
+        for (unsigned int j = 0; j != DEV_COUNT; ++j){
+            Device = GetDevInfo((u8)i, (u8)j);
+            if (Device.VENDOR_ID == 0){
+                continue;
+            }
+            printf("Device: Bus#%u Device:#%u; ", (u32)i, j);
+            int knownVendor = -1;
+            for (u32 k = 0; *(Vendors.VendorsID + k) != 0; ++k){
+                if (*(Vendors.VendorsID + k) == Device.VENDOR_ID){
+                    knownVendor = k;
+                    break;
+                }
+            }
+
+            if (knownVendor != -1){
+                printf("VENDOR: %s; ", *(Vendors.Vendors_str + knownVendor));
+            }
+            else {
+                printf("VENDORID:%h; ", Device.VENDOR_ID);
+            }
+            printf("DEVICEID:%h\n", Device.DEVICE_ID);
+        }
     }
     return ret;
 }

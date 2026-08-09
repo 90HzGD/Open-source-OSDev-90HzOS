@@ -8,14 +8,15 @@
         char** clear();
         char** help();
         char** uname(char** arguments);
+        char** lspci();
 
         struct builtinCommands {
-            char*           commands[5];
-            unsigned int*   builtin_adr[5];
-            char            needs_args[5];
-            unsigned int    arg_count_min[5];
-            unsigned int    arg_count_max[5];
-            char*           help[5];
+            char*           commands[6];
+            unsigned int*   builtin_adr[6];
+            char            needs_args[6];
+            unsigned int    arg_count_min[6];
+            unsigned int    arg_count_max[6];
+            char*           help[6];
         };
 
         enum commands_rcode{
