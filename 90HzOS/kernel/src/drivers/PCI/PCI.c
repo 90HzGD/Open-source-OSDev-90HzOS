@@ -29,21 +29,13 @@ struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID){
         return Dev;
     }
     Dev.VENDOR_ID = (u16)Info;
-
-    Info = read_PCI(BUS_ID, DEV_ID, 0, 0x02);
-    Dev.DEVICE_ID = (u16)Info;
+    Dev.DEVICE_ID = (u16)(Info >> 16);
 
     Info = read_PCI(BUS_ID, DEV_ID, 0, 0x08);
     Dev.REVISION = (u8)Info;
-
-    Info = read_PCI(BUS_ID, DEV_ID, 0, 0x09);
-    Dev.INTERFACE = (u8)Info;
-
-    Info = read_PCI(BUS_ID, DEV_ID, 0, 0x0A);
-    Dev.SUBCLASS = (u8)Info;
-
-    Info = read_PCI(BUS_ID, DEV_ID, 0, 0x0B);
-    Dev.CLASS = (u8)Info;
+    Dev.INTERFACE = (u8)(Info >> 8);
+    Dev.SUBCLASS = (u8)(Info >> 16);
+    Dev.CLASS = (u8)(Info >> 24);
 
     Info = read_PCI(BUS_ID, DEV_ID, 0, 0x3C);
     Dev.INTERRUPT = (u8)Info;

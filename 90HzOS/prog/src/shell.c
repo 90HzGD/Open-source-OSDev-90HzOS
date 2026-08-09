@@ -56,9 +56,9 @@ void init_builtin_commands(){
 
     builtin_commands.commands[4]        = "lspci";
     builtin_commands.builtin_adr[4]     = (unsigned int*)&lspci;
-    builtin_commands.needs_args[4]      = 0;
+    builtin_commands.needs_args[4]      = -1;
     builtin_commands.arg_count_min[4]   = 0;
-    builtin_commands.arg_count_max[4]   = 1;
+    builtin_commands.arg_count_max[4]   = 0;
     builtin_commands.help[4]            = "Displays connected PCI devices";
 
     builtin_commands.commands[5]        = 0;
