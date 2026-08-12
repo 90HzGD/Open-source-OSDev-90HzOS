@@ -41,6 +41,8 @@ This project **IS NOT PROFESSIONAL**
     - `[x] Runs on 3 emulators: QEMU;86Box;VirtualBox`
     - `[x] Runs on real hardware!`
     - `[x] PCI Device Enumeration`
+- **Working on**:
+    - `[_] ATA Read / Write Driver`
 - **Planned:**
     - `[ ] Read / Write ATA Driver`
     - `[ ] Custom Filesystem`
