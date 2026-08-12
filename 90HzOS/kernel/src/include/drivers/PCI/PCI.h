@@ -25,7 +25,8 @@
     };
 
     u32 read_PCI(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID, u8 REG_OFFSET);
-    struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID);
+    struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID);
     void fillVendors(char** Vendors_str, u16* VendorsID);
+    u8 CheckMultifun(u8 BUS_ID, u8 DEV_ID);
 
 #endif

@@ -12,7 +12,7 @@ u32 read_PCI(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID, u8 REG_OFFSET){
     return ret;
 }
 
-struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID){
+struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID){
     // Init
     struct PCIDev_Descriptor Dev;
     Dev.VENDOR_ID = 0;
@@ -24,20 +24,20 @@ struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID){
     Dev.CLASS     = 0;
 
     u32 Info = 0;
-    Info = read_PCI(BUS_ID, DEV_ID, 0, 0x00);
+    Info = read_PCI(BUS_ID, DEV_ID, FUNC_ID, 0x00);
     if (Info == 0x0000 || Info == 0xFFFF || Info == 0xFFFFFFFF){
         return Dev;
     }
     Dev.VENDOR_ID = (u16)Info;
     Dev.DEVICE_ID = (u16)(Info >> 16);
 
-    Info = read_PCI(BUS_ID, DEV_ID, 0, 0x08);
+    Info = read_PCI(BUS_ID, DEV_ID, FUNC_ID, 0x08);
     Dev.REVISION = (u8)Info;
     Dev.INTERFACE = (u8)(Info >> 8);
     Dev.SUBCLASS = (u8)(Info >> 16);
     Dev.CLASS = (u8)(Info >> 24);
 
-    Info = read_PCI(BUS_ID, DEV_ID, 0, 0x3C);
+    Info = read_PCI(BUS_ID, DEV_ID, FUNC_ID, 0x3C);
     Dev.INTERRUPT = (u8)Info;
     return Dev;
 }
@@ -48,5 +48,15 @@ void fillVendors(char** Vendors_str, u16* VendorsID){
     for (u32 i = 0; *(VendorsStr + i) != 0; ++i){
         *(Vendors_str + i) = *(VendorsStr + i);
         *(VendorsID + i) = *(VendorIDs + i);
+    }
+}
+
+u8 CheckMultifun(u8 BUS_ID, u8 DEV_ID){
+    u32 Info = read_PCI(BUS_ID, DEV_ID, 0, 0x0E);   // Check if multifun
+    if ((u8)Info == (1 << 7)){                      //
+        return 1;
+    }
+    else {
+        return 0;
     }
 }

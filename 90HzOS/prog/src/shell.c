@@ -337,26 +337,49 @@ char** lspci(){
     printf("\nEnumerating PCI devices:\n");
     for (unsigned short i = 0; i != BUS_COUNT; ++i){
         for (unsigned int j = 0; j != DEV_COUNT; ++j){
-            Device = GetDevInfo((u8)i, (u8)j);
-            if (Device.VENDOR_ID == 0){
-                continue;
-            }
-            printf("Device: Bus#%u Device:#%u; ", (u32)i, j);
-            int knownVendor = -1;
-            for (u32 k = 0; *(Vendors.VendorsID + k) != 0; ++k){
-                if (*(Vendors.VendorsID + k) == Device.VENDOR_ID){
-                    knownVendor = k;
-                    break;
+            for (u16 k = 0; k != 8; ++k){
+            
+                Device = GetDevInfo((u8)i, (u8)j, (u8)k);
+                if (Device.VENDOR_ID == 0){
+                    continue;
+                }
+                printf("Device: Bus#%u Device:#%u Function: %u; ", (u32)i, j, (u32)k);
+                int knownVendor = -1;
+                for (u32 k = 0; *(Vendors.VendorsID + k) != 0; ++k){
+                    if (*(Vendors.VendorsID + k) == Device.VENDOR_ID){
+                        knownVendor = k;
+                        break;
+                    }
+                }
+
+                if (knownVendor != -1){
+                    printf("VENDOR: %s; ", *(Vendors.Vendors_str + knownVendor));
+                }
+                else {
+                    printf("VENDORID:%h; ", Device.VENDOR_ID);
+                }
+                printf("DEVICEID:%h\n", Device.DEVICE_ID);
+                if (Device.CLASS == 1){
+                    printf("\t\xC0Storage Device: ");
+                    switch(Device.SUBCLASS){
+                        case 0:
+                            printf("SCSI");
+                            break;
+                        case 1:
+                            printf("ATA/IDE");
+                            break;
+                        case 2:
+                            printf("Floppy Disk");
+                            break;
+                        case 6:
+                            printf("SATA/AHCI");
+                            break;
+                        default:
+                            printf("Unknown");
+                    }
+                    printf(" Drive\n");
                 }
             }
-
-            if (knownVendor != -1){
-                printf("VENDOR: %s; ", *(Vendors.Vendors_str + knownVendor));
-            }
-            else {
-                printf("VENDORID:%h; ", Device.VENDOR_ID);
-            }
-            printf("DEVICEID:%h\n", Device.DEVICE_ID);
         }
     }
     return ret;
