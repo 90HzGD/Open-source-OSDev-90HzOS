@@ -12,6 +12,15 @@ u32 read_PCI(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID, u8 REG_OFFSET){
     return ret;
 }
 
+u32 write_PCI(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID, u8 REG_OFFSET, u32 value){
+    u32 ret = 0;
+    u32 PCI_ID = 0;
+    PCI_ID = (1 << 31) | (BUS_ID << 16) | (DEV_ID << 11) | (FUNC_ID << 8) | REG_OFFSET;
+    outl(PCI_COMMAND, PCI_ID);
+    outl(PCI_DATA, value);
+    return ret;
+}
+
 struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID){
     // Init
     struct PCIDev_Descriptor Dev;

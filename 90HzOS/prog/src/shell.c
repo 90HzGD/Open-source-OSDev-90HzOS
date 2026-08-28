@@ -7,6 +7,7 @@
 #include "../../kernel/src/include/mem/mem_alloc.h"
 #include "../../kernel/src/include/types.h"
 #include "../../kernel/src/include/drivers/PCI/PCI.h"
+#include "../../kernel/src/include/drivers/ATA/atapio.h"
 
 char argument[2048];
 struct builtinCommands builtin_commands;
@@ -61,7 +62,14 @@ void init_builtin_commands(){
     builtin_commands.arg_count_max[4]   = 0;
     builtin_commands.help[4]            = "Displays connected PCI devices";
 
-    builtin_commands.commands[5]        = 0;
+    builtin_commands.commands[5]        = "lside";
+    builtin_commands.builtin_adr[5]     = (unsigned int*)&lside;
+    builtin_commands.needs_args[5]      = -1;
+    builtin_commands.arg_count_min[5]   = 0;
+    builtin_commands.arg_count_max[5]   = 0;
+    builtin_commands.help[5]            = "Displays connected IDE Drives";
+
+    builtin_commands.commands[6]        = 0;
     return;
 }
 
@@ -377,7 +385,7 @@ char** lspci(){
                         default:
                             printf("Unknown");
                     }
-                    printf(" Drive\n");
+                    printf(" Controller\n");
                 }
             }
         }
@@ -385,11 +393,103 @@ char** lspci(){
     return ret;
 }
 
+char** lside(){
+    *ret = (char*)OK;
+    *(ret+1) = (char*)0;
+    char exists = ATAControllerExists();
+    printf("\n");
+    if (!exists){
+        printf("No IDE Controllers attached to this machine.\n");
+        return ret;
+    }
+
+    u8* Controllers;
+    struct ATA_BARs REGS;
+    Controllers = GetATA_PCI_Controller();
+
+    u8 Controller_count;
+    Controller_count = 0;
+    for (u8 j = 0; *(Controllers+1+j) != 0xFF; j+=3){
+        ++Controller_count;
+    }
+
+    u8 Disk = 0;
+    char Out[512];
+    u8 Drive_type = 0;
+    for (u8 i = 0; i != Controller_count; ++i){  
+
+        REGS = Get_ATA_BARs(Controllers+i*3, Controllers+i*3+1, Controllers+i*3+2, i);
+
+        for (u8 j = 0; j != 4; ++j){
+            switch (j){
+                case 0:case 2:
+                    Disk = 0xA0;
+                    break;
+                case 1:case 3:
+                    Disk = 0xB0;
+                    break;
+            }
+            u8 status;
+            if (j < 2){
+                status = SelectDrive(REGS.BAR0, REGS.BAR1, Disk, i);
+            }
+            else{
+                status = SelectDrive(REGS.BAR2, REGS.BAR3, Disk, i);
+            }
+            if (status != 0){
+                continue;
+            }
+            override_str(Out, 512);
+            Drive_type = IdentifyATADrive(REGS, j, Out);
+            if (Drive_type == 0 || Drive_type == 3){
+                continue;
+            }
+            if (Drive_type == 2){
+                printf("\033\x01SATA Device:\033\x0F");
+            }
+            *(Out + 39) = 0;
+            *(Out + 53) = 0;
+            *(Out + 93) = 0;
+
+            char* str = (Out + 20);
+            cut_space(str);
+            printf("SERIAL NUMBER: %s | ", (Out + 20));
+
+            str = (Out + 46);
+            cut_space(str);
+            printf("FIRMWARE: %s | ", (Out + 46));
+
+            str = (Out + 54);
+            cut_space(str);
+            printf("MODEL: %s\n", (Out + 54));
+
+            u32 sectors = ((u32)(u8)*(Out + 122) << 24) | 
+                ((u32)(u8)*(Out + 123) << 16) | 
+                ((u32)(u8)*(Out + 120) << 8)  | 
+                (u32)(u8)*(Out + 121);
+
+            printf("LBA28 SECTORS: %u\nLBA: ", sectors);
+
+            if ((Out[98] & 0x02) != 0){
+                printf("SUPPORTED\n");
+            }
+            else {
+                printf("UNSUPPORTED\n");
+            }
+        }
+
+
+    }
+
+    return ret;
+
+}
+
 void com_err(struct command Com){
     printf("\n\033\x07[\033\4FAIL\033\x07]\033\x0F ");
     switch (Com.rcode){
         case Unknown:
-            printf("Unknown command: \033\x04%s\033\x0F\n", Com.command);
+            printf("Illegal command: \033\x04%s\033\x0F\n", Com.command);
             break;
         case Takes_No_Arg:
             printf("%s: \033\x04Takes no argument.\033\x0F\n", Com.command);

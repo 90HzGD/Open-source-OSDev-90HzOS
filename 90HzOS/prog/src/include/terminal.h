@@ -9,14 +9,15 @@
         char** help();
         char** uname(char** arguments);
         char** lspci();
+        char** lside();
 
         struct builtinCommands {
-            char*           commands[6];
-            unsigned int*   builtin_adr[6];
-            char            needs_args[6];
-            unsigned int    arg_count_min[6];
-            unsigned int    arg_count_max[6];
-            char*           help[6];
+            char*           commands[7];
+            unsigned int*   builtin_adr[7];
+            char            needs_args[7];
+            unsigned int    arg_count_min[7];
+            unsigned int    arg_count_max[7];
+            char*           help[7];
         };
 
         enum commands_rcode{

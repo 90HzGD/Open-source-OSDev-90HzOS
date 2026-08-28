@@ -1,4 +1,3 @@
-#define INCLUDE_FROM_KRNL
 #include "include/kernel.h"
 #include "include/drivers/keyboard/ps2.h"
 #include "include/vga/stdio.h"
@@ -7,7 +6,7 @@
 #include "../../prog/src/include/terminal.h"
 #include "include/string.h"
 #include "include/mem/mem_alloc.h"
-#undef INCLUDE_FROM_KRNL
+#include "include/drivers/ATA/atapio.h"
 
 struct avail_RAM initRAMstruct;
 int extended_key;
@@ -33,7 +32,7 @@ enum Return_codes_main main(){
     *test_malloc1 = 8596;
     *test_malloc = 2000000000;
     if (test_malloc0 == 0x00 || test_malloc == 0x00 || test_malloc1 == 0x00){
-        printf("\033\x07[\033\x04WARN\033\x07]\033\x0F Malloc() returned 0! Check if your memory is functionnable.");
+        printf("\033\x07[\033\x04WARN\033\x07]\033\x0F Malloc Error.");
     }
     else {
         init_bloc(test_malloc);
@@ -48,8 +47,7 @@ enum Return_codes_main main(){
     printf("\033\x07[\033\x0EPASS\033\x07]\033\x0F %s", string);
     extern volatile unsigned int position;
 
-    print_string("Source code: https://github.com/90HzGD/Open-source-OSDev-90HzOS/tree/main\n", 0x01, &position);
-
+    print_string("Source code: github.com/90HzGD/Open-source-OSDev-90HzOS\n", 0x01, &position);
     next_entry(0);
     return _OK;
 }

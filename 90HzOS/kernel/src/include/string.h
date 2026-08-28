@@ -8,5 +8,7 @@
     unsigned int length_arrptr(char** string);
     unsigned char in_str_arr(char** str, char* target);
     unsigned char search_str_arr(char** str, char* target);
+    void override_str(char* str, unsigned int count);
+    void cut_space(char* str);
 
 #endif

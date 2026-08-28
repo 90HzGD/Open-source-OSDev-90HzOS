@@ -1,5 +1,6 @@
 #include "include/string.h" 
 #include "include/vga/stdio.h"
+#include "include/types.h"
     void reverse_string(char* string){
         char* string_cpy = 0;
         unsigned int str_len = length(string);
@@ -64,3 +65,25 @@
         }
         return arr_idx + 1;
     }
+
+void override_str(char* str, unsigned int count){
+    for (u32 i = 0; i != count; ++i){
+        *(str+ i) = 0;
+    }
+    return;
+}
+
+void cut_space(char* str){
+    u8 space = 0;
+    for (u32 i = 0; *(str + i) != 0; ++i){
+        if (*(str + i) == 0x20){
+            if (!space){
+                space = 1;
+            }
+            else {
+                *(str + i) = 0;
+                break;
+            }
+        }
+    }
+}

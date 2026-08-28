@@ -1,5 +1,6 @@
 #include "../include/vga/stdio.h"
-#include "../include/kernel.h"   
+#include "../include/kernel.h"
+#include "../include/string.h"
     void change_color(const char color, volatile unsigned int *position){
         *((unsigned char*)VRAM_ATT_ADR+(*position*2)) = color;
         return;
@@ -140,6 +141,7 @@
     void print_integer(int integer, volatile unsigned int* position){
         extern volatile unsigned char Color;
         char int_string[11];
+        override_str(int_string, 11);
         char unit;
         unsigned char int_to_char = 0;
         unsigned int integer_len = 0;
@@ -249,6 +251,7 @@
     void print_uinteger(unsigned int uinteger, volatile unsigned int* position){
         extern volatile unsigned char Color;
         char uint_string[11];
+        override_str(uint_string, 11);
         unsigned char uint_to_char = 0;
         unsigned char unit;
         unsigned int  uinteger_len = 0;

@@ -1,6 +1,5 @@
-#include "../../types.h"
-
 #ifndef PCI_H
+    #include "../../types.h"
     #define PCI_H
 
     #define PCI_COMMAND     0xCF8
@@ -25,6 +24,7 @@
     };
 
     u32 read_PCI(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID, u8 REG_OFFSET);
+    u32 write_PCI(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID, u8 REG_OFFSET, u32 value);
     struct PCIDev_Descriptor GetDevInfo(u8 BUS_ID, u8 DEV_ID, u8 FUNC_ID);
     void fillVendors(char** Vendors_str, u16* VendorsID);
     u8 CheckMultifun(u8 BUS_ID, u8 DEV_ID);
