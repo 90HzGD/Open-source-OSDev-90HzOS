@@ -11,7 +11,7 @@
     void print_hex(const unsigned int* ptr, volatile unsigned int* position);
     void change_color(const char color, volatile unsigned int *position);
     void move_grid(unsigned int count);
-    void print_char(volatile const char displayed_char, const char attributes, volatile unsigned int *position);
+    void print_char(volatile const unsigned char displayed_char, const char attributes, volatile unsigned int *position);
     void print_string(volatile const char* string, const char attributes, volatile unsigned int* position);
     void set_BGcolor(const char color);
 

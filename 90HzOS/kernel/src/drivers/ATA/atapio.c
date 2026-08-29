@@ -192,7 +192,6 @@ char IdentifyATADrive(struct ATA_BARs ATARegs, u8 DriveIdx, char* Output){
         }
         u8 LBA_mid = inb(ComPort+4); u8 LBA_high = inb(ComPort+5);
         if (LBA_mid || LBA_high){
-            printf("mid=%h, high=%h", LBA_mid, LBA_high);
             if (LBA_mid == 0x3C && LBA_high == 0xC3){
                 ret = 2;
                 goto DEBUG_READ;

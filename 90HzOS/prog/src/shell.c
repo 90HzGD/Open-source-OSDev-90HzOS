@@ -402,7 +402,7 @@ char** lside(){
         printf("No IDE Controllers attached to this machine.\n");
         return ret;
     }
-
+    printf("\033\16Attached ATA Devices:\n\033\x0F");
     u8* Controllers;
     struct ATA_BARs REGS;
     Controllers = GetATA_PCI_Controller();
@@ -412,11 +412,17 @@ char** lside(){
     for (u8 j = 0; *(Controllers+1+j) != 0xFF; j+=3){
         ++Controller_count;
     }
+    if (Controller_count > 1) printf("\xC7");
+    else printf("\xC8");
+    
 
     u8 Disk = 0;
     char Out[512];
     u8 Drive_type = 0;
-    for (u8 i = 0; i != Controller_count; ++i){  
+    u8 Disk_nbr = 0;
+    u16 Old_pos = 0;
+    for (u8 i = 0; i != Controller_count; ++i){
+        printf("\033\4Controller #%u\033\x0F\n", (u32)i);
 
         REGS = Get_ATA_BARs(Controllers+i*3, Controllers+i*3+1, Controllers+i*3+2, i);
 
@@ -444,9 +450,18 @@ char** lside(){
             if (Drive_type == 0 || Drive_type == 3){
                 continue;
             }
-            if (Drive_type == 2){
-                printf("\033\x01SATA Device:\033\x0F");
+            ++Disk_nbr;
+            printf("\t\xC8\033\1Disk #%u\033\x0F\n\t\t\xC7", (u32)j);
+            Old_pos = position;
+            position -= 405;
+            if (Disk_nbr > 1){
+                for (u8 k = 0; k != 4; ++k){
+                    if (!k) print_char('\xC7', 0x0F, &position);
+                    else print_char('\xBA', 0x0F, &position);
+                    position += 79;
+                }
             }
+            position = Old_pos;
             *(Out + 39) = 0;
             *(Out + 53) = 0;
             *(Out + 93) = 0;
@@ -468,7 +483,7 @@ char** lside(){
                 ((u32)(u8)*(Out + 120) << 8)  | 
                 (u32)(u8)*(Out + 121);
 
-            printf("LBA28 SECTORS: %u\nLBA: ", sectors);
+            printf("\t\t\xC7LBA28 SECTORS: %u\n\t\t\xC8LBA: ", sectors);
 
             if ((Out[98] & 0x02) != 0){
                 printf("SUPPORTED\n");
