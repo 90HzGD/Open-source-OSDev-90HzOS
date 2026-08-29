@@ -56,6 +56,8 @@ This project **IS NOT PROFESSIONAL**
     - 90HzOS while running on **real hardware** _(PC ref: Samsung NP300E5A-S04FR)_
 - ![OS Running](pictures/90HzOS.png)
     - 90HzOS while running
+- ![IDE PCI Device Enumeration](pictures/ata_enum.png)
+    - IDE PCI Enumeration
 - ![OS shutted down](pictures/shutdown.png)
     - 90HzOS while shut down via ^Q(Ctrl + Q)
 
